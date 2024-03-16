@@ -63,7 +63,12 @@ app.post("/login", function (req, res) {
 		let user = userManager.loginUser(username, password);
 		if (user != null) {
 			res.cookie("user", user);
-			res.redirect("/");
+			// Check if the user is an admin
+            if (user.type === "admin") {
+                res.redirect("/admin"); // Redirect to admin page
+            } else {
+                res.redirect("/"); // Redirect to regular user page
+            }
 		} else {
 			res.send("User doesn't exist");
 		}
