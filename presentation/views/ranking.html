@@ -58,61 +58,22 @@
 		</style>
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 		<script>
-			$(document).ready(function () {
-				$.getJSON("./database/ranking.json", function (data) {
-					// Sort the ranking data by score (descending order)
-					data.sort((a, b) => b.score - a.score);
-
-					// Display only the top 10 highest scores
-					const top10 = data.slice(0, 10);
-
-					// Display the ranking data
-					const rankingContainer = $("#ranking");
-					const table = $("<table></table>"); // Create table element
-
-					// Create thead element and header columns
-					const thead = $("<thead></thead>");
-					const headerRow = $("<tr></tr>");
-					const headerColumns = ["Top", "Username", "Score"];
-
-					// Append header columns to the header row
-					headerColumns.forEach((column) => {
-						const th = $("<th></th>").text(column);
-						headerRow.append(th);
-					});
-
-					// Append the header row to the thead
-					thead.append(headerRow);
-
-					// Append thead to the table
-					table.append(thead);
-
-					// Create tbody element
-					const tbody = $("<tbody></tbody>");
-
-					// Append tbody to the table
-					table.append(tbody);
-
-					// Append table to the ranking container
-					rankingContainer.append(table);
-
-					// Populate table body with ranking data
-					top10.forEach((user, index) => {
-						const rank = index + 1;
-						// Create table row and cells for each user
-						const row = $("<tr></tr>");
-						const rankCell = $("<td></td>").text(`#${rank}`);
-						const usernameCell = $("<td></td>").text(user.username);
-						const scoreCell = $("<td></td>").text(user.score);
-						// Set background color for rank cell
-						row.css("background-color", `#327FC6`);
-						// Append cells to the row
-						row.append(rankCell, usernameCell, scoreCell);
-						// Append row to the table body
-						tbody.append(row);
-					});
-				});
-			});
+			// $(document).ready(function () {
+            // // Make AJAX request to fetch ranking data from backend
+            // $.get("/ranking", function (data) {
+            //     const rankingContainer = $("#ranking table tbody");
+            //     // Populate table body with ranking data
+            //     data.forEach((user, index) => {
+            //         const rank = index + 1;
+            //         const row = $("<tr></tr>");
+            //         const rankCell = $("<td></td>").text(`#${rank}`);
+            //         const usernameCell = $("<td></td>").text(user.username);
+            //         const scoreCell = $("<td></td>").text(user.score);
+            //         row.append(rankCell, usernameCell, scoreCell);
+            //         rankingContainer.append(row);
+            //     });
+            // });
+        // });
 		</script>
 	</head>
 
@@ -126,13 +87,27 @@
 			/>
 
 			<div id="ranking">
-				<h1
-					id="rankingTitle"
-					style="color: greenyellow; text-align: center; margin-bottom: 20px"
-				>
-					TOP 10 HIGHEST SCORE:
-				</h1>
-			</div>
+                <h1 id="rankingTitle" style="color: greenyellow; text-align: center; margin-bottom: 20px;">TOP 10 HIGHEST SCORE:</h1>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Top</th>
+                            <th>Username</th>
+                            <th>Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% ranks.forEach((user, index) => { %>
+                            <tr>
+                                <td><%= index + 1 %></td> <!-- Rank -->
+                                <td><%= user.username %></td> <!-- Username -->
+                                <td><%= user.score %></td> <!-- Score -->
+                            </tr>
+                        <% }); %>
+                </tbody>
+                    </tbody>
+                </table>
+            </div>
 			<div id="backButton">
 				<a href="/profile"><button>Back to Profile</button></a>
 			</div>

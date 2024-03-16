@@ -16,41 +16,43 @@ app.engine("html", ejs.renderFile);
 let questionManager = require("./questions");
 let userManager = require("./users");
 const questions = require("./questions");
+const ranking = require("./ranking");
 const adminRouter = require("./admin");
-let userActions = ['New Game','History','Ranking','Logout']
+let userActions = ["New Game", "History", "Ranking", "Logout"];
 //
 app.listen(80, () => {
 	console.log("Server is running on 80");
 	//no
 	questionManager.loadData();
 	userManager.loadData();
+	ranking.loadData();
 });
 
 //
-app.get("/",(req,res)=>{
-    let user = req.cookies.user
-	console.log('user cookie',user)
-    if (user == undefined || user == null) {
-        res.redirect('/login')
-    } else {
-		if (user.type == 'admin') {
+app.get("/", (req, res) => {
+	let user = req.cookies.user;
+	console.log("user cookie", user);
+	if (user == undefined || user == null) {
+		res.redirect("/login");
+	} else {
+		if (user.type == "admin") {
 			res.redirect("/admin");
 		} else {
-			res.redirect('/player')
+			res.redirect("/player");
 		}
-    }
-})
-app.get('/login',function(req, res){
-	console.log('render login')
-    res.render('login')
-})
-app.get('/player',function(req, res){
-	let user = req.cookies.user
-    res.render('player',{user:user, actions : userActions})
-})
-app.get('/game',function(req, res){
-    res.render('game')
-})
+	}
+});
+app.get("/login", function (req, res) {
+	console.log("render login");
+	res.render("login");
+});
+app.get("/player", function (req, res) {
+	let user = req.cookies.user;
+	res.render("player", { user: user, actions: userActions });
+});
+app.get("/game", function (req, res) {
+	res.render("game");
+});
 
 //
 app.post("/login", function (req, res) {
@@ -82,25 +84,32 @@ app.post("/login", function (req, res) {
 	}
 });
 
-app.post('/userAction', function(req,res) {
-	let action = req.body.action
+app.post("/userAction", function (req, res) {
+	let action = req.body.action;
 	if (action == userActions[3]) {
-		console.log('user logout')
+		console.log("user logout");
 		// Logout
 		for (let cookieName in req.cookies) {
-			console.log('clear cookie ',cookieName)
+			console.log("clear cookie ", cookieName);
 			res.clearCookie(cookieName);
 		}
-		res.redirect('/')
-	} else if (action == 'History') {
-		res.redirect('/history')
-	} else if (action == 'Ranking') {
-		res.redirect('/ranking')
+		res.redirect("/");
+	} else if (action == "History") {
+		res.redirect("/history");
+	} else if (action == "Ranking") {
+		res.redirect("/ranking");
 	}
-})
+});
 
 app.get(`/ranking`, (req, res) => {
-	res.render(`ranking`);
+	// console.log(`Show data of ranking`, ranking);
+	let ranks = ranking.getData();
+	// Sort the ranks array by score (descending order)
+    ranks.sort((a, b) => b.score - a.score);
+
+    // Limit to the top 10 highest scores
+    ranks = ranks.slice(0, 10);
+	res.render(`ranking`, { ranks });
 });
 
 app.get(`/history`, (req, res) => {
