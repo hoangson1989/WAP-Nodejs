@@ -41,7 +41,7 @@ class User {
                 return null
             }
         }
-        let newUser = {username : username, password : password}
+        let newUser = {username : username, password : password,type : "user", id: this.data.length}
         this.data.push(newUser)
         this.save()
         return newUser
