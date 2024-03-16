@@ -1,11 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <link rel="stylesheet" href="../css/player.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script>
+        function changeAction(sender) {
+            let action = $(sender).val()
+            $('input[name="action"]').val(action)
+        }
+    </script>
 </head>
+
 <body>
-    
+    <div style="position: relative;">
+        <img id="bg" src="/images/millionaire01.jpg">
+        <img id="icon" style="position: absolute;"
+            src="/images/who-wants-to-be-a-millionaire-2014-millionaire-2017-game-show-quiz-android-thumbnail.png">
+
+        <div id="info">
+            <h2 style="color: green;">Hi, <%= user.username %> !</h2>
+
+            <form action="/userAction" method="post">
+                <input type="hidden" name="action" value="">
+                <div>
+                   <% for (let item of actions) { %>
+                    <button value="<%= item %>" onclick="changeAction(this)"> <%= item %> </button>
+                    <% } %>
+                </div>
+            </form>
+        </div>
+
+    </div>
 </body>
+
 </html>

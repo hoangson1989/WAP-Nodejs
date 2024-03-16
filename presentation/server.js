@@ -17,7 +17,7 @@ let questionManager = require("./questions");
 let userManager = require("./users");
 const questions = require("./questions");
 const adminRouter = require("./admin");
-
+let userActions = ['New Game','History','Ranking','Logout']
 //
 app.listen(80, () => {
 	console.log("Server is running on 80");
@@ -27,23 +27,30 @@ app.listen(80, () => {
 });
 
 //
-app.get("/", (req, res) => {
-	let user = req.cookies.user;
-	if (user == undefined || user == null) {
-		res.redirect("/login");
-	} else {
-		res.redirect("/player");
-	}
-});
-app.get("/login", function (req, res) {
-	res.render("login");
-});
-app.get("/player", function (req, res) {
-	res.render("player");
-});
-app.get("/game", function (req, res) {
-	res.render("game");
-});
+app.get("/",(req,res)=>{
+    let user = req.cookies.user
+	console.log('user cookie',user)
+    if (user == undefined || user == null) {
+        res.redirect('/login')
+    } else {
+		if (user.type == 'admin') {
+			res.redirect("/admin");
+		} else {
+			res.redirect('/player')
+		}
+    }
+})
+app.get('/login',function(req, res){
+	console.log('render login')
+    res.render('login')
+})
+app.get('/player',function(req, res){
+	let user = req.cookies.user
+    res.render('player',{user:user, actions : userActions})
+})
+app.get('/game',function(req, res){
+    res.render('game')
+})
 
 //
 app.post("/login", function (req, res) {
@@ -62,18 +69,30 @@ app.post("/login", function (req, res) {
 	} else {
 		let user = userManager.loginUser(username, password);
 		if (user != null) {
-			res.cookie("username", user.username);
-			// Check if the user is an admin
-			if (user.type === "admin") {
-				res.redirect("/admin"); // Redirect to admin page
-			} else {
-				res.redirect("/profile"); // Redirect to regular user page
-			}
+			res.cookie("user", user);
+			res.redirect('/')
 		} else {
 			res.send("User doesn't exist");
 		}
 	}
 });
+
+app.post('/userAction', function(req,res) {
+	let action = req.body.action
+	if (action == userActions[3]) {
+		console.log('user logout')
+		// Logout
+		for (let cookieName in req.cookies) {
+			console.log('clear cookie ',cookieName)
+			res.clearCookie(cookieName);
+		}
+		res.redirect('/')
+	} else if (action == 'History') {
+		res.redirect('/history')
+	} else if (action == 'Ranking') {
+		res.redirect('/ranking')
+	}
+})
 
 app.get(`/ranking`, (req, res) => {
 	res.render(`ranking`);

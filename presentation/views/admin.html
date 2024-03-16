@@ -4,6 +4,7 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 		<title>Admin Page</title>
 		<style>
 			table {
@@ -47,6 +48,8 @@
 	</head>
 	<body>
 		<h1>Admin Page</h1>
+		<button onclick="logout()">Logout</button>
+		<br><hr>
 		<label for="">Add more question: </label
 		><button onclick="addRow()">Add</button>
 		<br />
@@ -96,6 +99,15 @@
 			<button id="nextBtn" onclick="nextPage()">Next</button>
 		</div>
 		<script>
+			function logout() {
+				console.log('logout click')
+				$.post('/userAction', {
+					"action" : "Logout"
+				})
+				.done((res)=>{
+					window.location.href = '/'
+				})
+			}
 			// Function to add a new row
 			function addRow() {
 				const table = document

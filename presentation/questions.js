@@ -25,6 +25,16 @@ class Question {
     getData() {
         return this.data;
     }
-}
 
-module.exports = new Question()
+    save() {
+        fs.writeFile(path.join(__dirname,'database','questions.json'), JSON.stringify(this.data), 'utf8', (err) => {
+            if (err) {
+                console.error(err);
+                return;
+            }
+            console.log('Data has been written to the file.');
+        });
+    }
+}
+const data = new Question()
+module.exports = data
