@@ -1,0 +1,16 @@
+[
+	{ "id": 320, "username": "user1", "score": 300 },
+	{ "id": 17, "username": "user2", "score": 250 },
+	{ "id": 25, "username": "user3", "score": 480 },
+    { "id": 30, "username": "user3", "score": 480 },
+    { "id": 17, "username": "user3", "score": 500 },
+    { "id": 65, "username": "user3", "score": 900 },
+    { "id": 15, "username": "user3", "score": 610 },
+    { "id": 79, "username": "user3", "score": 377 },
+    { "id": 18, "username": "user3", "score": 245 },
+    { "id": 16, "username": "user3", "score": 199 },
+    { "id": 32, "username": "user3", "score": 620 },
+    { "id": 64, "username": "user3", "score": 321 },
+    { "id": 103, "username": "user3", "score": 952 },
+    { "id": 97, "username": "user3", "score": 480 }
+]
