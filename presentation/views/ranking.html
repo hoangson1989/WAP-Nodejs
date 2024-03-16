@@ -99,7 +99,6 @@
 					// Populate table body with ranking data
 					top10.forEach((user, index) => {
 						const rank = index + 1;
-						const color = getRainbowColor(index);
 						// Create table row and cells for each user
 						const row = $("<tr></tr>");
 						const rankCell = $("<td></td>").text(`#${rank}`);
@@ -114,12 +113,6 @@
 					});
 				});
 			});
-
-			// Function to get rainbow color based on index
-			function getRainbowColor(index) {
-				const hue = (index * 30) % 360; // Calculate hue value in degrees
-				return `hsl(${hue}, 70%, 50%)`; // Return color in HSL format
-			}
 		</script>
 	</head>
 
