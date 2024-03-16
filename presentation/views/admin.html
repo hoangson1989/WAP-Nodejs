@@ -33,6 +33,16 @@
 				background-color: #007bff;
 				color: white;
 			}
+			/* CSS for current page button */
+			.current-page {
+				background-color: #007bff; /* Blue background color */
+				color: white; /* Text color */
+				font-weight: bold; /* Bold text font */
+				border: 1px solid #007bff; /* Blue border */
+				border-radius: 5px; /* Rounded corners */
+				padding: 5px 10px; /* Padding */
+				margin: 0 3px; /* Margin */
+			}
 		</style>
 	</head>
 	<body>
@@ -41,7 +51,7 @@
 		><button onclick="addRow()">Add</button>
 		<br />
 		<br />
-		<label for="">Filter by Type: </label>
+		<label for="">Filter by Difficulty: </label>
 		<select id="typeFilter" onchange="filterByType()">
 			<option value="">All</option>
 			<option value="easy">easy</option>
@@ -80,7 +90,11 @@
 				<% }); %>
 			</tbody>
 		</table>
-
+		<div class="pagination">
+			<button id="prevBtn" onclick="prevPage()">Previous</button>
+			<div id="pageButtons"></div>
+			<button id="nextBtn" onclick="nextPage()">Next</button>
+		</div>
 		<script>
 			// Function to add a new row
 			function addRow() {
@@ -186,6 +200,123 @@
 					count !== 1 ? "s" : ""
 				})`;
 			}
+			//PAGINATION
+			let currentPage = 1; // Current page number
+			const rowsPerPage = 100; // Number of rows per page
+
+			// Function to get total number of pages based on total number of rows
+			function getTotalPages() {
+				const totalRows =
+					document.getElementById("dataTable").getElementsByTagName("tr")
+						.length - 1; // Exclude header row
+				return Math.ceil(totalRows / rowsPerPage);
+			}
+
+			// Function to display rows for the current page
+			function displayRows() {
+				const rows = document
+					.getElementById("dataTable")
+					.getElementsByTagName("tr");
+				const startIndex = (currentPage - 1) * rowsPerPage + 1; // Start index of rows for current page
+				const endIndex = Math.min(
+					startIndex + rowsPerPage - 1,
+					rows.length - 1
+				); // End index of rows for current page
+
+				for (let i = 1; i < rows.length; i++) {
+					rows[i].style.display =
+						i >= startIndex && i <= endIndex ? "" : "none";
+				}
+
+				updatePaginationButtons(); // Update pagination buttons
+			}
+
+			// Function to navigate to previous page
+			function prevPage() {
+				if (currentPage > 1) {
+					currentPage--;
+					displayRows();
+				}
+			}
+
+			// Function to navigate to next page
+			function nextPage() {
+				if (currentPage < getTotalPages()) {
+					currentPage++;
+					displayRows();
+				}
+			}
+
+			// Function to generate page number buttons
+			function generatePageButtons() {
+				const pageButtonsContainer = document.getElementById("pageButtons");
+				pageButtonsContainer.innerHTML = ""; // Clear existing buttons
+
+				const totalPages = getTotalPages();
+
+				// Generate button for previous page
+				if (!document.getElementById("prevBtn")) {
+					const prevBtn = document.createElement("button");
+					prevBtn.textContent = "Previous";
+					prevBtn.id = "prevBtn";
+					prevBtn.onclick = prevPage;
+					pageButtonsContainer.appendChild(prevBtn);
+				}
+
+				// Calculate the range of page numbers to display
+				let startPage = Math.max(1, currentPage - 3);
+				let endPage = Math.min(totalPages, currentPage + 3);
+
+				// Adjust startPage and endPage if there are less than 6 pages in total
+				if (totalPages < 6) {
+					startPage = 1;
+					endPage = totalPages;
+				} else {
+					if (currentPage < 4) {
+						endPage = 6;
+					} else if (currentPage > totalPages - 3) {
+						startPage = totalPages - 5;
+					}
+				}
+
+				// Generate buttons for the page numbers
+				for (let i = startPage; i <= endPage; i++) {
+					const button = document.createElement("button");
+					button.textContent = i;
+					button.onclick = function () {
+						currentPage = i;
+						displayRows();
+					};
+					if (i === currentPage) {
+						button.classList.add("current-page"); // Add CSS class for current page button
+					}
+					pageButtonsContainer.appendChild(button);
+				}
+
+				// Generate button for next page
+				if (!document.getElementById("nextBtn")) {
+					const nextBtn = document.createElement("button");
+					nextBtn.textContent = "Next";
+					nextBtn.id = "nextBtn";
+					nextBtn.onclick = nextPage;
+					pageButtonsContainer.appendChild(nextBtn);
+				}
+			}
+
+			// Function to update pagination buttons based on current page
+			function updatePaginationButtons() {
+				const prevBtn = document.getElementById("prevBtn");
+				const nextBtn = document.getElementById("nextBtn");
+
+				prevBtn.style.display = currentPage == 1 ? "none" : "inline";
+				nextBtn.style.display =
+					currentPage == getTotalPages() ? "none" : "inline";
+
+				generatePageButtons(); // Generate page number buttons
+			}
+
+			// Initial display of rows and pagination buttons
+			displayRows();
 		</script>
 	</body>
 </html>
