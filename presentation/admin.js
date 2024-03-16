@@ -1,7 +1,7 @@
 let fs = require("fs");
 const express = require(`express`);
 var path = require(`path`);
-let questionManager = require("./questions");
+const questionManager = require("./questions");
 
 const option = {
 	caseSensitive: true,
@@ -10,57 +10,39 @@ const option = {
 
 const adminRouter = express.Router(option);
 
-adminRouter.get("/", (req, res) => {
-	const jsonData = questionManager.getData();
-	const itemsPerPage = 20; // Define items per page
-	const currentPage = req.query.page || 1; // Current page from query parameter, default to 1 if not provided
-	res.render("admin",{ questions: jsonData, itemsPerPage, currentPage });
-});
+// Load the question data when the server starts
+questionManager.loadData();
 
-adminRouter.get('/questionsData',(req, res) => {
-	const jsonData = questionManager.getData();
-	const itemsPerPage = 20; // Define items per page
-	const currentPage = req.query.page || 1; // Current page from query parameter, default to 1 if not provided
-	res.json({ questions: jsonData, itemsPerPage, currentPage });
-})
+adminRouter.get("/", (req, res) => {
+	// Get the questions data
+	const questions = questionManager.getData();
+	// Pass the data and pagination variables to the EJS template
+	res.render("admin", { questions });
+});
 
 // Endpoint to delete a question
 adminRouter.post("/deleteQuestion", (req, res) => {
 	const { id } = req.body;
-	console.log(req.body);
-	console.log(id);
-	let questions = questionManager.getData()
-
-	// Find the index of the question with the provided ID
-	const index = questions.findIndex((question) => question.id == id);
-	console.log(`index of the delete: `, index);
-
-	if (index === -1) {
-		res.status(404).json({ error: "Question not found" });
-		return;
+	let questionsData = questionManager.getData();
+	for (let i = 0; i < questionsData.length; i++) {
+		if (id == questionsData[i].id) {
+			questionsData.splice(i, 1);
+			break;
+		}
 	}
-
-	// Remove the question at the specified index
-	questions.splice(index, 1);
-
-	// Write the updated JSON back to the file
-	questionManager.save()
+	questionManager.save();
+	res.render(`admin`, { questions: questionManager.getData() });
 });
 
 // Endpoint to add a new question
 adminRouter.post("/addQuestion", (req, res) => {
 	const { rowData } = req.body;
-	console.log(rowData);
-
-	let questions = questionManager.getData();
+	let questionsData = questionManager.getData();
 
 	// Split the last value of rowData by comma and trim each value
 	const lastValueAsArray = rowData[rowData.length - 1]
 		.split(",")
 		.map((item) => item.trim());
-
-	// Parse the ID from the user input to an integer
-	const inpuId = parseInt(rowData[0]);
 
 	// Create a new question object with the provided data
 	const newQuestion = {
@@ -70,16 +52,16 @@ adminRouter.post("/addQuestion", (req, res) => {
 		question: rowData[4], // Assign a new ID (assuming IDs start from 1)
 		correct_answer: rowData[5], // Assign a new ID (assuming IDs start from 1)
 		incorrect_answers: lastValueAsArray,
-		id: inpuId, // Assign a new ID (assuming IDs start from 1)
+		id: questionsData.length + 1,
 	};
 
 	// Push the new question to the array of questions
-	questions.push(newQuestion);
+	questionsData.push(newQuestion);
 
-	// Write the updated JSON back to the file
-	questionManager.save()
+	questionManager.save();
+	res.render(`admin`, { questions: questionManager.getData() });
+
+	
 });
-
-
 
 module.exports = adminRouter;
