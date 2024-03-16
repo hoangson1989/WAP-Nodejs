@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="../css/login.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script>
+        function changeAction(sender) {
+            let action = $(sender).html()
+            $("input[name='action']").val(action)
+        }
+    </script>
+</head>
+
+<body style="padding: 0px; margin: 0px;">
+    <div style="position: relative;">
+        <img id="bg" src="/images/millionaire01.jpg">
+        <img id="icon" style="position: absolute;"
+            src="/images/who-wants-to-be-a-millionaire-2014-millionaire-2017-game-show-quiz-android-thumbnail.png">
+
+        <div id="login">
+            <h2 style="color: green;">Please Login or Register</h2>
+            <form action="/login" method="post">
+                <label>Username</label><input type="text" name="username">
+                <br>
+                <label>Password</label><input type="password" name="password">
+                <br>
+                <input type="hidden" name="action" value="">
+                <br>
+                <div style="display: flex; justify-content: space-evenly;">
+                    <button onclick="changeAction(this)">Login</button>
+                    <button onclick="changeAction(this)">Register</button>
+                </div>
+            </form>
+        </div>
+
+        <img id="moneys" src="/images/moenys.gif">
+    </div>
+</body>
+
+</html>
