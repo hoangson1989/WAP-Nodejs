@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,10 +8,195 @@
     <link rel="stylesheet" href="../css/game.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="../script/game.js"></script>
+    <script>
+        let currentQuestion;
+        let selectedDiv = null;
+        let level = 'easy'
+        let questionNumber = 1
+        let timeoutID = null;
+        let currentPrice = null
+
+        function timeout() {
+            console.log('timeout')
+            timeoutID = null
+            $.post('/answerQuestion', { question: JSON.stringify(currentQuestion), answer: ''})
+            endGame(false)
+        }
+
+        function endGame(isWin) {
+            $('#gameplay').css('visibility','hidden')
+            $('#awards').css('visibility','hidden')
+            if (isWin) {
+                $('#success').css('visibility','visible')
+            } else {
+                $('#failure').css('visibility','visible')
+            }
+            setTimeout(() => {
+                window.location.href = '/'
+            }, 2000);
+        }
+
+        function answer(sender) {
+            if (selectedDiv == null) {
+                selectedDiv = sender
+                let userAnswer = $(sender).html().split(": ")[1]
+                $(sender).css('background-color', 'burlywood')
+
+                $.post('/answerQuestion', { question: JSON.stringify(currentQuestion), answer: userAnswer }, function (data) {
+                    console.log(data);
+                    setTimeout(() => {
+                        if (data.result) {
+                            $(sender).css('background-color', 'green')
+                            //
+                            if (currentPrice != null) {
+                                $(currentPrice).css('color','yellow')
+                                $(currentPrice).css('background-color','')
+                            }
+                            let prices = $('label[name="price"]')
+                            currentPrice = prices[prices.length - questionNumber]
+                            $(currentPrice).css('background-color','yellow')
+                            //
+                            questionNumber++
+                            if (questionNumber == 6) {
+                                level = 'medium'
+                            } else if (questionNumber == 11) {
+                                level = 'hard'
+                            }
+                            //
+                            setTimeout(() => {
+                                if (questionNumber <= 15) {
+                                    getQuestion()
+
+                                } else {
+                                    endGame(true)
+                                }
+                            }, 2000);
+                        } else {
+                            $(sender).css('background-color', 'red')
+                            setTimeout(() => {
+                                endGame(false)
+                            }, 2000);
+                        }
+
+                        //
+                    }, 2000);
+                }).fail(function (xhr, status, error) {
+                    // Handle errors
+                    console.error('There was a problem with the request:', error);
+                });
+
+                //
+                pauseAnimation()
+            }
+        }
+
+        function getQuestion() {
+            if (selectedDiv != null) {
+                $(selectedDiv).css('background-color', '')
+                selectedDiv = null
+            }
+
+            $.get('/getQuestion', { 'level': level }, function (res) {
+                currentQuestion = res
+
+                $('h3#question').html(`Question ${questionNumber}: ` + res.question)
+                let answers = res.incorrect_answers
+                const randomIndex = Math.floor(Math.random() * (answers.length + 1));
+                answers.splice(randomIndex, 0, res.correct_answer);
+                let divs = $('div.answer')
+                for (let i = 0; i < answers.length; i++) {
+                    let prefix = 'D: ';
+                    if (i == 0) {
+                        prefix = "A: "
+                    } else if (i == 1) {
+                        prefix = "B: "
+                    } else if (i == 1) {
+                        prefix = "C: "
+                    }
+                    $(divs[i]).html(prefix + answers[i])
+                }
+
+                //
+                resetAnimation()
+            })
+        }
+
+        // Pause the animation
+        function pauseAnimation() {
+            if (timeoutID != null) {
+                clearTimeout(timeoutID)
+                timeoutID = null
+            }
+            $('#progress').css('animation-play-state', 'paused');
+        }
+
+        function resetAnimation() {
+            $('#progress').css('animation', 'none');
+            setTimeout(function () {
+                $('#progress').css('animation', 'countdown-fill 60s linear forwards');
+                $('#progress').css('animation-play-state', 'running');
+                timeoutID = setTimeout(timeout, 60000);
+            }, 10);
+        }
+
+        $(document).ready(() => {
+            pauseAnimation()
+            getQuestion();
+        })
+    </script>
 </head>
+
 <body>
-    <div id="timer" class="timer">
-        <div id="progress"></div>
+    <div id="content">
+        <img id="bg" src="/images/millionaire01.jpg">
+        <img id="icon" style="position: absolute;"
+            src="/images/who-wants-to-be-a-millionaire-2014-millionaire-2017-game-show-quiz-android-thumbnail.png">
+
+        <div id="gameplay">
+            <h3 id="question" style="text-align: center;"> This is Question</h3>
+            <div id="answers">
+                <div class="answer" onclick="answer(this)">Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                    Soluta illo tempora
+                    aspernatur maxime ratione quibusdam eligendi veritatis repellendus commodi corrupti iste vero
+                    nostrum asperiores, perspiciatis nihil saepe quidem assumenda odit?</div>
+                <div class="answer" onclick="answer(this)">B: Answer B</div>
+                <div class="answer" onclick="answer(this)">C: Answer C</div>
+                <div class="answer" onclick="answer(this)">D: Answer D</div>
+            </div>
+
+            <div id="clockContain">
+                <div id="timer" class="timer">
+                    <div id="progress"></div>
+                </div>
+
+                <img id="clock"
+                    src="/images/30-second-timer-display-in-flat-style-countdown-time-counter-in-circle-png.png">
+            </div>
+        </div>
+
+        <div id="failure">You're fail!!!</div>
+        <div id="success">You're millionaire!!!</div>
+        <div id="awards">
+            <label name="price" style="font-size: 28px;">$1.000.000</label>
+            <label name="price" style="font-size: 28px;">$500.000</label>
+            <label name="price" style="font-size: 26px;">$400.000</label>
+            <label name="price" style="font-size: 25px;">$300.000</label>
+            <label name="price"  style="font-size: 24px;">$200.000</label>
+
+            <label name="price" style="font-size: 23px;">$100.000</label>
+            <label name="price" style="font-size: 22px;">$50.000</label>
+            <label name="price" style="font-size: 21px;">$30.000</label>
+            <label name="price" style="font-size: 20px;">$20.000</label>
+            <label name="price" style="font-size: 19px;">$15.000</label>
+
+            <label name="price" style="font-size: 18px;">$10.000</label>
+            <label name="price" style="font-size: 18px;">$7.000</label>
+            <label name="price" style="font-size: 18px;">$5.000</label>
+            <label name="price" style="font-size: 18px;">$2.000</label>
+            <label name="price" style="font-size: 18px;">$1.000</label>
+
+        </div>
     </div>
 </body>
+
 </html>

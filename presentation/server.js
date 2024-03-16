@@ -17,7 +17,7 @@ let questionManager = require("./questions");
 let userManager = require("./users");
 const questions = require("./questions");
 const adminRouter = require("./admin");
-let userActions = ['New Game','History','Ranking','Logout']
+let userActions = ['New Game', 'History', 'Ranking', 'Logout']
 //
 app.listen(80, () => {
 	console.log("Server is running on 80");
@@ -27,31 +27,74 @@ app.listen(80, () => {
 });
 
 //
-app.get("/",(req,res)=>{
-    let user = req.cookies.user
-	console.log('user cookie',user)
-    if (user == undefined || user == null) {
-        res.redirect('/login')
-    } else {
+app.get("/", (req, res) => {
+	let user = req.cookies.user
+	console.log('user cookie', user)
+	if (user == undefined || user == null) {
+		res.redirect('/login')
+	} else {
 		if (user.type == 'admin') {
 			res.redirect("/admin");
 		} else {
 			res.redirect('/player')
 		}
-    }
+	}
 })
-app.get('/login',function(req, res){
+app.get('/login', function (req, res) {
 	console.log('render login')
-    res.render('login')
+	res.render('login')
 })
-app.get('/player',function(req, res){
+app.get('/player', function (req, res) {
 	let user = req.cookies.user
-    res.render('player',{user:user, actions : userActions})
+	res.render('player', { user: user, actions: userActions })
 })
-app.get('/game',function(req, res){
-    res.render('game')
+app.get('/game', function (req, res) {
+	res.render('game')
 })
 
+app.get('/getQuestion', (req, res) => {
+	const jsonData = questionManager.getData();
+	let oldQuestionIDs = req.cookies.olds
+	if (oldQuestionIDs == undefined || oldQuestionIDs == null) {
+		oldQuestionIDs = []
+	}
+
+	let level = req.query.level // easy, medium, hard
+	let array = jsonData.filter((val) => {
+		return (val.difficulty == level && oldQuestionIDs.includes(val.id) == false)
+	})
+
+	if (array.length > 0) {
+		const randomIndex = Math.floor(Math.random() * (array.length));
+		let obj = array[randomIndex]
+		console.log("Question", obj)
+		res.json(obj)
+	} else {
+		res.json({})
+	}
+})
+app.post('/answerQuestion', (req, res) => {
+	//
+	let oldQuestionIDs = req.cookies.olds
+	if (oldQuestionIDs == undefined || oldQuestionIDs == null) {
+		oldQuestionIDs = []
+	}
+	//
+	let question = JSON.parse(req.body.question)
+	let answer = req.body.answer
+	if (question.correct_answer == answer) {
+		oldQuestionIDs.push(question.id)
+		res.cookie('olds', oldQuestionIDs)
+		//
+		res.json({ result: true })
+	} else {
+		// save records
+		let user = req.cookies.user
+		userManager.saveRecord(oldQuestionIDs.length, user.username)
+		//
+		res.json({ result: false })
+	}
+})
 //
 app.post("/login", function (req, res) {
 	let username = req.body.username;
@@ -77,13 +120,13 @@ app.post("/login", function (req, res) {
 	}
 });
 
-app.post('/userAction', function(req,res) {
+app.post('/userAction', function (req, res) {
 	let action = req.body.action
 	if (action == userActions[3]) {
 		console.log('user logout')
 		// Logout
 		for (let cookieName in req.cookies) {
-			console.log('clear cookie ',cookieName)
+			console.log('clear cookie ', cookieName)
 			res.clearCookie(cookieName);
 		}
 		res.redirect('/')
@@ -91,6 +134,9 @@ app.post('/userAction', function(req,res) {
 		res.redirect('/history')
 	} else if (action == 'Ranking') {
 		res.redirect('/ranking')
+	} else if (action == 'New Game') {
+		res.clearCookie('olds')
+		res.redirect('/game')
 	}
 })
 
@@ -100,6 +146,10 @@ app.get(`/ranking`, (req, res) => {
 
 app.get(`/history`, (req, res) => {
 	res.render(`history`);
+});
+
+app.get(`/game`, (req, res) => {
+	res.render(`game`);
 });
 
 app.use(`/admin`, adminRouter);
