@@ -1,83 +1,141 @@
 <!DOCTYPE html>
 <html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Document</title>
+		<link rel="stylesheet" href="../css/login.css" />
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+		<style>
+			#backButton {
+				position: absolute;
+				bottom: 200px; /* Adjust the distance from the bottom as needed */
+				left: 50%; /* Place it at 50% from the left */
+				transform: translateX(-50%); /* Center it horizontally */
+			}
+			#ranking {
+				max-height: 500px; /* Set maximum height to limit the size of the ranking area */
+				padding: 20px;
+				border-radius: 10%;
+				position: absolute; /* Position the ranking div absolutely */
+				top: 50%; /* Place it at 50% from the top */
+				left: 50%; /* Place it at 50% from the left */
+				transform: translate(
+					-50%,
+					-50%
+				); /* Center it both vertically and horizontally */
+				z-index: 99;
+			}
+			.user {
+				border-radius: 10%;
+				margin-bottom: 10px;
+				padding: 10px; /* Increase padding for better spacing */
+				padding-left: 50px;
+				padding-right: 50px;
+				text-align: center;
+				color: white; /* Text color */
+				font-weight: bold; /* Bold text font */
+				overflow: hidden; /* Hide overflow content */
+				position: relative; /* Position relative for child elements */
+			}
+			table {
+				width: 100%;
+				border-collapse: collapse;
+			}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="../css/login.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <style>
-        #backButton {
-            position: absolute;
-            bottom: 150px; /* Adjust the distance from the bottom as needed */
-            left: 50%; /* Place it at 50% from the left */
-            transform: translateX(-50%); /* Center it horizontally */
-        }
-        #ranking {
-            max-height: 500px; /* Set maximum height to limit the size of the ranking area */
-            padding: 20px;
-            border-radius: 10%;
-            border: 2px solid yellow; /* Yellow solid border */
-            position: absolute; /* Position the ranking div absolutely */
-            top: 50%; /* Place it at 50% from the top */
-            left: 50%; /* Place it at 50% from the left */
-            transform: translate(-50%, -50%); /* Center it both vertically and horizontally */
-            z-index: 99;
-        }
-        .user {
-            border-radius: 10%;
-            margin-bottom: 10px;
-            padding: 10px; /* Increase padding for better spacing */
-            padding-left: 50px;
-            padding-right: 50px;
-            text-align: center;
-            color: white; /* Text color */
-            font-weight: bold; /* Bold text font */
-            overflow: hidden; /* Hide overflow content */
-            position: relative; /* Position relative for child elements */
-        }
-    </style>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            $.getJSON('./database/ranking.json', function(data) {
-                // Sort the ranking data by score (descending order)
-                data.sort((a, b) => b.score - a.score);
+			th,
+			td {
+				padding: 8px;
+				text-align: center;
+				border-bottom: 1px solid #ddd;
+				color: white;
+				font-weight: bold;
+			}
 
-                // Display only the top 10 highest scores
-                const top10 = data.slice(0, 10);
+			th {
+				background-color: #8d98ed;
+			}
+		</style>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+		<script>
+			$(document).ready(function () {
+				$.getJSON("./database/ranking.json", function (data) {
+					// Sort the ranking data by score (descending order)
+					data.sort((a, b) => b.score - a.score);
 
-                // Display the ranking data
-                const rankingContainer = $('#ranking');
-                top10.forEach((user, index) => {
-                    const rank = index + 1;
-                    const color = getRainbowColor(index);
-                    const userHtml = `<div class="user" style="background-color: ${color};">#${rank}: ${user.username} - Score: ${user.score}</div>`;
-                    rankingContainer.append(userHtml);
-                });
-            });
-        });
+					// Display only the top 10 highest scores
+					const top10 = data.slice(0, 10);
 
-        // Function to get rainbow color based on index
-        function getRainbowColor(index) {
-            const hue = (index * 30) % 360; // Calculate hue value in degrees
-            return `hsl(${hue}, 70%, 50%)`; // Return color in HSL format
-        }
-    </script>
-</head>
+					// Display the ranking data
+					const rankingContainer = $("#ranking");
+					const table = $("<table></table>"); // Create table element
 
-<body style="padding: 0px; margin: 0px;">
-    <div style="position: relative;">
-        <img id="bg" src="/images/millionaire01.jpg">
-        <img id="icon" style="position: absolute;"
-            src="/images/who-wants-to-be-a-millionaire-2014-millionaire-2017-game-show-quiz-android-thumbnail.png">
+					// Create thead element and header columns
+					const thead = $("<thead></thead>");
+					const headerRow = $("<tr></tr>");
+					const headerColumns = ["Top", "Username", "Score"];
 
-            <div id="ranking"></div>
-            <div id="backButton">
-                <a href="/"><button>Back to Profile</button></a>
-            </div>
-    </div>
-</body>
+					// Append header columns to the header row
+					headerColumns.forEach((column) => {
+						const th = $("<th></th>").text(column);
+						headerRow.append(th);
+					});
 
+					// Append the header row to the thead
+					thead.append(headerRow);
+
+					// Append thead to the table
+					table.append(thead);
+
+					// Create tbody element
+					const tbody = $("<tbody></tbody>");
+
+					// Append tbody to the table
+					table.append(tbody);
+
+					// Append table to the ranking container
+					rankingContainer.append(table);
+
+					// Populate table body with ranking data
+					top10.forEach((user, index) => {
+						const rank = index + 1;
+						// Create table row and cells for each user
+						const row = $("<tr></tr>");
+						const rankCell = $("<td></td>").text(`#${rank}`);
+						const usernameCell = $("<td></td>").text(user.username);
+						const scoreCell = $("<td></td>").text(user.score);
+						// Set background color for rank cell
+						row.css("background-color", `#327FC6`);
+						// Append cells to the row
+						row.append(rankCell, usernameCell, scoreCell);
+						// Append row to the table body
+						tbody.append(row);
+					});
+				});
+			});
+		</script>
+	</head>
+
+	<body style="padding: 0px; margin: 0px">
+		<div style="position: relative">
+			<img id="bg" src="/images/millionaire01.jpg" />
+			<img
+				id="icon"
+				style="position: absolute"
+				src="/images/who-wants-to-be-a-millionaire-2014-millionaire-2017-game-show-quiz-android-thumbnail.png"
+			/>
+
+			<div id="ranking">
+				<h1
+					id="rankingTitle"
+					style="color: greenyellow; text-align: center; margin-bottom: 20px"
+				>
+					TOP 10 HIGHEST SCORE:
+				</h1>
+			</div>
+			<div id="backButton">
+				<a href="/profile"><button>Back to Profile</button></a>
+			</div>
+		</div>
+	</body>
 </html>

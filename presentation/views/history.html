@@ -27,6 +27,23 @@
 				); /* Center it both vertically and horizontally */
 				z-index: 99;
 			}
+			table {
+				width: 100%;
+				border-collapse: collapse;
+			}
+
+			th,
+			td {
+				padding: 8px;
+				text-align: center;
+				border-bottom: 1px solid #ddd;
+                color: white;
+                font-weight: bold;
+			}
+
+			th {
+				background-color: #8d98ed;
+			}
 			.score {
 				border-radius: 10px; /* Update border-radius for rounded corners */
 				margin-bottom: 10px;
@@ -60,12 +77,21 @@
 									// Select only the last 10 entries from the history array
 									const last10Entries = user.history.slice(0, 10);
 
-									// Display the history data
-									const historyContainer = $("#history");
+									// Display the history data as a table
+									const table = $("<table></table>");
+									const tableHeader = $("<tr></tr>").append(
+										$("<th>Date</th>"),
+										$("<th>Score</th>")
+									);
+									table.append(tableHeader);
 									last10Entries.forEach((entry) => {
-										const historyHtml = `<div class="score">${entry.dateTime} - Score: ${entry.score}</div>`;
-										historyContainer.append(historyHtml);
+										const row = $("<tr></tr>").append(
+											$("<td></td>").text(entry.dateTime),
+											$("<td></td>").text(entry.score)
+										);
+										table.append(row);
 									});
+									$("#history").append(table);
 								} else {
 									console.log("User not found");
 								}
