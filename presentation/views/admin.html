@@ -1,0 +1,149 @@
+<!-- admin.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Page</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid #000; /* Solid border */
+            text-align: left;
+            padding: 8px;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .pagination button {
+            margin: 0 5px;
+            cursor: pointer;
+            padding: 5px 10px;
+        }
+        .active {
+            background-color: #007bff;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>Admin Page</h1>
+    <label for="">Add more question:    </label><button onclick="addRow()">Add</button>
+    <br>
+    <br>
+    <table id="dataTable">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Type</th>
+                <th>Difficulty</th>
+                <th>Category</th>
+                <th>Question</th>
+                <th>Correct Answer</th>
+                <th>Incorrect Answers</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% questions.forEach(question => { %>
+                <tr>
+                    <td><%= question.id %></td>
+                    <td><%= question.type %></td>
+                    <td><%= question.difficulty %></td>
+                    <td><%= question.category %></td>
+                    <td><%= question.question %></td>
+                    <td><%= question.correct_answer %></td>
+                    <td><%= question.incorrect_answers.join(', ') %></td>
+                    <td><button onclick="deleteRow(this)">Delete</button></td>
+                </tr>
+            <% }); %>
+        </tbody>
+    </table>
+
+    <script>
+
+        // Function to add a new row
+        function addRow() {
+            const table = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
+            const newRow = table.insertRow(table.rows.length);
+
+            // Insert cells with input fields
+            const cellCount = 8; // Assuming 8 cells per row
+            for (let i = 0; i < cellCount; i++) {
+                const cell = newRow.insertCell(i);
+                if (i === cellCount - 1) {
+                    // Add save button in the last cell
+                    const saveBtn = document.createElement('button');
+                    saveBtn.textContent = 'Save';
+                    saveBtn.onclick = () => saveRow(newRow);
+                    cell.appendChild(saveBtn);
+                } else {
+                    // Add input fields for other cells
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.placeholder = 'Enter value';
+                    cell.appendChild(input);
+                }
+            }
+            // Scroll to the newly inserted row
+            window.scrollTo(0, document.body.scrollHeight);
+        }
+
+        function deleteRow(button) {
+            const row = button.parentNode.parentNode;
+            const id = row.cells[0].textContent; // Assuming ID is in the first cell
+            const confirmation = confirm('Are you sure you want to delete this question?');
+
+            if (confirmation) {
+                // Send an AJAX request to delete the question
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', '/admin/deleteQuestion', true);
+                xhr.setRequestHeader('Content-Type', 'application/json');
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        console.log('Question deleted successfully');
+                        // Remove the row from the UI after successful deletion
+                        row.parentNode.removeChild(row);
+                    } else {
+                        console.error('Error deleting question');
+                    }
+                };
+                xhr.send(JSON.stringify({ id: id }));
+            }
+        }
+
+        // Function to save data from a row
+        function saveRow(row) {
+            const inputs = row.querySelectorAll('input[type="text"]');
+            const rowData = Array.from(inputs).map(input => input.value);
+
+            // Send data to server
+            fetch('/admin/addQuestion', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ rowData: rowData })
+            })
+            .then(response => {
+                if (response.ok) {
+                    console.log('Question added successfully');
+                    // Redirect to admin page after successful save
+                    window.location.href = '/admin';
+                } else {
+                    console.error('Error adding question');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
+</body>
+</html>
