@@ -70,4 +70,8 @@ app.post("/login", function (req, res) {
 	}
 });
 
+app.get(`/ranking`,(req,res)=>{
+	res.render(`ranking`)
+});
+
 app.use(`/admin`, adminRouter);
