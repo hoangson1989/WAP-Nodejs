@@ -4,93 +4,8 @@
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Document</title>
-		<link rel="stylesheet" href="../css/login.css" />
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-		<style>
-			#backButton {
-				position: absolute;
-				bottom: 150px; /* Adjust the distance from the bottom as needed */
-				left: 50%; /* Place it at 50% from the left */
-				transform: translateX(-50%); /* Center it horizontally */
-			}
-			#history {
-				max-height: 600px; /* Set maximum height to limit the size of the ranking area */
-				padding: 20px;
-				border-radius: 10%;
-				border: 2px solid yellow; /* Yellow solid border */
-				position: absolute; /* Position the ranking div absolutely */
-				top: 50%; /* Place it at 50% from the top */
-				left: 50%; /* Place it at 50% from the left */
-				transform: translate(
-					-50%,
-					-50%
-				); /* Center it both vertically and horizontally */
-				z-index: 99;
-			}
-			.score {
-				border-radius: 10px; /* Update border-radius for rounded corners */
-				margin-bottom: 10px;
-				padding: 10px;
-				text-align: center;
-				color: black; /* Text color */
-				font-weight: bold; /* Bold text font */
-				background-color: #c7e9c7; /* Grey background color */
-			}
-		</style>
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-		<script>
-			$(document).ready(function () {
-				// const username = getCookie("username"); // Get the username from the cookie
-				const username = getCookie("user").username;
-				if (username) {
-					$("#historyTitle").text(`Playing history of ${username}`);
-				}
-				if (username) {
-					$.getJSON("./database/users.json", function (data) {
-						const user = data.find((u) => u.username === username);
-						if (username) {
-							$.getJSON("./database/users.json", function (data) {
-								const user = data.find((u) => u.username === username);
-								if (user) {
-									// Sort the history array by date in descending order
-									user.history.sort(
-										(a, b) => new Date(b.dateTime) - new Date(a.dateTime)
-									);
-
-									// Select only the last 10 entries from the history array
-									const last10Entries = user.history.slice(0, 10);
-
-									// Display the history data
-									const historyContainer = $("#history");
-									last10Entries.forEach((entry) => {
-										const historyHtml = `<div class="score">${entry.dateTime} - Score: ${entry.score}</div>`;
-										historyContainer.append(historyHtml);
-									});
-								} else {
-									console.log("User not found");
-								}
-							});
-						} else {
-							console.log("Username cookie not found");
-						}
-					});
-				} else {
-					console.log("Username cookie not found");
-				}
-
-				// Function to get cookie value by name
-				function getCookie(name) {
-					const cookies = document.cookie.split(";");
-					for (let cookie of cookies) {
-						const [cookieName, cookieValue] = cookie.split("=");
-						if (cookieName.trim() === name) {
-							return cookieValue;
-						}
-					}
-					return null;
-				}
-			});
-		</script>
+		<link rel="stylesheet" href="../css/history.css" />
+		
 	</head>
 
 	<body style="padding: 0px; margin: 0px">
@@ -104,8 +19,26 @@
 			<div id="history">
 				<h1
 					id="historyTitle"
-					style="color: greenyellow; text-align: center; margin-bottom: 20px"
-				></h1>
+					style="color: red; text-align: center; margin-bottom: 20px"
+				>
+					Playing history of <%=username %>
+				</h1>
+				<table>
+					<thead>
+						<tr>
+							<th>Date</th>
+							<th>Score</th>
+						</tr>
+					</thead>
+					<tbody>
+						<% top10Latest.forEach(entry => { %>
+						<tr>
+							<td><%= entry.dateTime %></td>
+							<td><%= entry.score %></td>
+						</tr>
+						<% }); %>
+					</tbody>
+				</table>
 			</div>
 			<div id="backButton">
 				<a href="/"><button>Back to Profile</button></a>
