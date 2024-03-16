@@ -4,77 +4,8 @@
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Document</title>
-		<link rel="stylesheet" href="../css/login.css" />
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-		<style>
-			#backButton {
-				position: absolute;
-				bottom: 200px; /* Adjust the distance from the bottom as needed */
-				left: 50%; /* Place it at 50% from the left */
-				transform: translateX(-50%); /* Center it horizontally */
-			}
-			#ranking {
-				max-height: 500px; /* Set maximum height to limit the size of the ranking area */
-				padding: 20px;
-				border-radius: 10%;
-				position: absolute; /* Position the ranking div absolutely */
-				top: 50%; /* Place it at 50% from the top */
-				left: 50%; /* Place it at 50% from the left */
-				transform: translate(
-					-50%,
-					-50%
-				); /* Center it both vertically and horizontally */
-				z-index: 99;
-			}
-			.user {
-				border-radius: 10%;
-				margin-bottom: 10px;
-				padding: 10px; /* Increase padding for better spacing */
-				padding-left: 50px;
-				padding-right: 50px;
-				text-align: center;
-				color: white; /* Text color */
-				font-weight: bold; /* Bold text font */
-				overflow: hidden; /* Hide overflow content */
-				position: relative; /* Position relative for child elements */
-			}
-			table {
-				width: 100%;
-				border-collapse: collapse;
-			}
-
-			th,
-			td {
-				padding: 8px;
-				text-align: center;
-				border-bottom: 1px solid #ddd;
-				color: white;
-				font-weight: bold;
-			}
-
-			th {
-				background-color: #8d98ed;
-			}
-		</style>
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-		<script>
-			// $(document).ready(function () {
-            // // Make AJAX request to fetch ranking data from backend
-            // $.get("/ranking", function (data) {
-            //     const rankingContainer = $("#ranking table tbody");
-            //     // Populate table body with ranking data
-            //     data.forEach((user, index) => {
-            //         const rank = index + 1;
-            //         const row = $("<tr></tr>");
-            //         const rankCell = $("<td></td>").text(`#${rank}`);
-            //         const usernameCell = $("<td></td>").text(user.username);
-            //         const scoreCell = $("<td></td>").text(user.score);
-            //         row.append(rankCell, usernameCell, scoreCell);
-            //         rankingContainer.append(row);
-            //     });
-            // });
-        // });
-		</script>
+		<link rel="stylesheet" href="../css/ranking.css" />
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>		
 	</head>
 
 	<body style="padding: 0px; margin: 0px">
@@ -87,7 +18,7 @@
 			/>
 
 			<div id="ranking">
-                <h1 id="rankingTitle" style="color: greenyellow; text-align: center; margin-bottom: 20px;">TOP 10 HIGHEST SCORE:</h1>
+                <h1 id="rankingTitle" style="color: red; text-align: center; margin-bottom: 20px;">TOP 10 HIGHEST SCORE:</h1>
                 <table>
                     <thead>
                         <tr>

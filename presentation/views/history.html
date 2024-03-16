@@ -4,56 +4,8 @@
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Document</title>
-		<link rel="stylesheet" href="../css/login.css" />
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-		<style>
-			#backButton {
-				position: absolute;
-				bottom: 150px; /* Adjust the distance from the bottom as needed */
-				left: 50%; /* Place it at 50% from the left */
-				transform: translateX(-50%); /* Center it horizontally */
-			}
-			#history {
-				max-height: 600px; /* Set maximum height to limit the size of the ranking area */
-				padding: 20px;
-				border-radius: 10%;
-				border: 2px solid yellow; /* Yellow solid border */
-				position: absolute; /* Position the ranking div absolutely */
-				top: 50%; /* Place it at 50% from the top */
-				left: 50%; /* Place it at 50% from the left */
-				transform: translate(
-					-50%,
-					-50%
-				); /* Center it both vertically and horizontally */
-				z-index: 99;
-			}
-			table {
-				width: 100%;
-				border-collapse: collapse;
-			}
-
-			th,
-			td {
-				padding: 8px;
-				text-align: center;
-				border-bottom: 1px solid #ddd;
-				color: white;
-				font-weight: bold;
-			}
-
-			th {
-				background-color: #8d98ed;
-			}
-			.score {
-				border-radius: 10px; /* Update border-radius for rounded corners */
-				margin-bottom: 10px;
-				padding: 10px;
-				text-align: center;
-				color: black; /* Text color */
-				font-weight: bold; /* Bold text font */
-				background-color: #c7e9c7; /* Grey background color */
-			}
-		</style>
+		<link rel="stylesheet" href="../css/history.css" />
+		
 	</head>
 
 	<body style="padding: 0px; margin: 0px">
@@ -67,7 +19,7 @@
 			<div id="history">
 				<h1
 					id="historyTitle"
-					style="color: greenyellow; text-align: center; margin-bottom: 20px"
+					style="color: red; text-align: center; margin-bottom: 20px"
 				>
 					Playing history of <%=username %>
 				</h1>
