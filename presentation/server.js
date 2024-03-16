@@ -79,4 +79,8 @@ app.get(`/ranking`, (req, res) => {
 	res.render(`ranking`);
 });
 
+app.get(`/history`, (req, res) => {
+	res.render(`history`);
+});
+
 app.use(`/admin`, adminRouter);

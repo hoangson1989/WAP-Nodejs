@@ -1,1 +1,18 @@
-[{"username":"admin","password":"admin","id":1,"type":"admin"},{"username":"mike","password":"123","type":"user","id":1}]
+[
+	{ "username": "admin", "password": "admin", "id": 1, "type": "admin" },
+	{ "username": "mike", "password": "123", "type": "user", "id": 1, "history":[
+        {"score": 15, "dateTime": "2024-03-16"},
+        {"score": 38, "dateTime": "2024-02-16"},
+        {"score": 26, "dateTime": "2024-01-15"},
+        {"score": 19, "dateTime": "2024-03-12"},
+        {"score": 45, "dateTime": "2024-03-09"},
+        {"score": 50, "dateTime": "2024-03-09"},
+        {"score": 30, "dateTime": "2024-03-09"},
+        {"score": 65, "dateTime": "2024-03-09"},
+        {"score": 95, "dateTime": "2024-03-09"},
+        {"score": 30, "dateTime": "2024-03-09"},
+        {"score": 45, "dateTime": "2024-03-09"},
+        {"score": 76, "dateTime": "2024-03-09"},
+        {"score": 12, "dateTime": "2024-03-09"}
+    ] }
+]
