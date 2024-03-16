@@ -105,15 +105,29 @@ app.get(`/ranking`, (req, res) => {
 	// console.log(`Show data of ranking`, ranking);
 	let ranks = ranking.getData();
 	// Sort the ranks array by score (descending order)
-    ranks.sort((a, b) => b.score - a.score);
+	ranks.sort((a, b) => b.score - a.score);
 
-    // Limit to the top 10 highest scores
-    ranks = ranks.slice(0, 10);
+	// Limit to the top 10 highest scores
+	ranks = ranks.slice(0, 10);
 	res.render(`ranking`, { ranks });
 });
 
 app.get(`/history`, (req, res) => {
-	res.render(`history`);
+	// Retrieve username from cookies
+	const username = req.cookies.username;
+
+	let users = userManager.getData();
+	let history = [];
+	for (let user of users) {
+		if (user.username == username) {
+			history = user.history;
+		}
+	}
+
+	history.sort((a, b) => new Date(b.dateTime) - new Date(a.dateTime));
+	const top10Latest = history.slice(0, 10);
+
+	res.render(`history`, { top10Latest, username });
 });
 
 app.use(`/admin`, adminRouter);

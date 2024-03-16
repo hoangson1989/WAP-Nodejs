@@ -54,69 +54,6 @@
 				background-color: #c7e9c7; /* Grey background color */
 			}
 		</style>
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-		<script>
-			$(document).ready(function () {
-				// const username = getCookie("username"); // Get the username from the cookie
-				const username = getCookie("username");
-				if (username) {
-					$("#historyTitle").text(`Playing history of ${username}`);
-				}
-				if (username) {
-					$.getJSON("./database/users.json", function (data) {
-						const user = data.find((u) => u.username === username);
-						if (username) {
-							$.getJSON("./database/users.json", function (data) {
-								const user = data.find((u) => u.username === username);
-								if (user) {
-									// Sort the history array by date in descending order
-									user.history.sort(
-										(a, b) => new Date(b.dateTime) - new Date(a.dateTime)
-									);
-
-									// Select only the last 10 entries from the history array
-									const last10Entries = user.history.slice(0, 10);
-
-									// Display the history data as a table
-									const table = $("<table></table>");
-									const tableHeader = $("<tr></tr>").append(
-										$("<th>Date</th>"),
-										$("<th>Score</th>")
-									);
-									table.append(tableHeader);
-									last10Entries.forEach((entry) => {
-										const row = $("<tr></tr>").append(
-											$("<td></td>").text(entry.dateTime),
-											$("<td></td>").text(entry.score)
-										);
-										table.append(row);
-									});
-									$("#history").append(table);
-								} else {
-									console.log("User not found");
-								}
-							});
-						} else {
-							console.log("Username cookie not found");
-						}
-					});
-				} else {
-					console.log("Username cookie not found");
-				}
-
-				// Function to get cookie value by name
-				function getCookie(name) {
-					const cookies = document.cookie.split(";");
-					for (let cookie of cookies) {
-						const [cookieName, cookieValue] = cookie.split("=");
-						if (cookieName.trim() === name) {
-							return cookieValue;
-						}
-					}
-					return null;
-				}
-			});
-		</script>
 	</head>
 
 	<body style="padding: 0px; margin: 0px">
@@ -131,7 +68,25 @@
 				<h1
 					id="historyTitle"
 					style="color: greenyellow; text-align: center; margin-bottom: 20px"
-				></h1>
+				>
+					Playing history of <%=username %>
+				</h1>
+				<table>
+					<thead>
+						<tr>
+							<th>Date</th>
+							<th>Score</th>
+						</tr>
+					</thead>
+					<tbody>
+						<% top10Latest.forEach(entry => { %>
+						<tr>
+							<td><%= entry.dateTime %></td>
+							<td><%= entry.score %></td>
+						</tr>
+						<% }); %>
+					</tbody>
+				</table>
 			</div>
 			<div id="backButton">
 				<a href="/"><button>Back to Profile</button></a>
