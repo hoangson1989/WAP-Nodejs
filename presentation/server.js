@@ -27,20 +27,24 @@ app.listen(80, () => {
 });
 
 //
-app.get("/", (req, res) => {
-	let user = req.cookies.user;
-	if (user == undefined || user == null) {
-		res.redirect("/login");
-	} else {
-		res.redirect("/player");
-	}
-});
-app.get("/login", function (req, res) {
-	res.render("login");
-});
-app.get("/player", function (req, res) {
-	res.render("player");
-});
+app.get("/",(req,res)=>{
+    let user = req.cookies.user
+    if (user == undefined || user == null) {
+        res.redirect('/login')
+    } else {
+        res.redirect('/player')
+    }
+})
+app.get('/login',function(req, res){
+    res.render('login')
+})
+app.get('/player',function(req, res){
+    res.render('player')
+})
+app.get('/game',function(req, res){
+    res.render('game')
+})
+
 //
 app.post("/login", function (req, res) {
 	let username = req.body.username;

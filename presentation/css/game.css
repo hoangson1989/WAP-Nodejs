@@ -1,0 +1,92 @@
+
+div#timer {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+div#progress {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: green;
+    clip-path: polygon(50% 50%, 50% 0, 100% 0, 100% 0%);
+    animation: countdown-fill 30s linear forwards;
+}
+
+@keyframes countdown-fill {
+    0% {
+        clip-path: polygon(50% 50%, 50% 0, 100% 0, 100% 50%, 100% 100%, 50% 100%, 0% 100%, 0% 50%, 0% 0%, 50% 0%);
+        background-color: green;
+    }
+
+    12% {
+        clip-path: polygon(50% 50%, 50% 0, 100% 0, 100% 50%, 100% 100%, 50% 100%, 0% 100%, 0% 50%, 0% 0%, 0% 0%);
+    }
+
+    12.01% {
+        clip-path: polygon(50% 50%, 50% 0, 100% 0, 100% 50%, 100% 100%, 50% 100%, 0% 100%, 0% 50%, 0% 0%);
+    }
+
+    25% {
+        clip-path: polygon(50% 50%, 50% 0, 100% 0, 100% 50%, 100% 100%, 50% 100%, 0% 100%, 0% 50%, 0% 50%);
+    }
+
+    25.01% {
+        clip-path: polygon(50% 50%, 50% 0, 100% 0, 100% 50%, 100% 100%, 50% 100%, 0% 100%, 0% 51%);
+    }
+
+    33.01% {
+        background-color: yellow;
+    }
+
+    37% {
+        clip-path: polygon(50% 50%, 50% 0, 100% 0, 100% 50%, 100% 100%, 50% 100%, 0% 100%, 0% 100%);
+    }
+
+    37.01% {
+        clip-path: polygon(50% 50%, 50% 0, 100% 0, 100% 50%, 100% 100%, 50% 100%, 1% 100%);
+    }
+
+    50% {
+        clip-path: polygon(50% 50%, 50% 0, 100% 0, 100% 50%, 100% 100%, 50% 100%, 50% 100%);
+    }
+
+    50.01% {
+        clip-path: polygon(50% 50%, 50% 0, 100% 0, 100% 50%, 100% 100%, 51% 100%);
+    }
+
+    62% {
+        clip-path: polygon(50% 50%, 50% 0, 100% 0, 100% 50%, 100% 100%, 100% 100%);
+    }
+
+    62.01% {
+        clip-path: polygon(50% 50%, 50% 0, 100% 0, 100% 50%, 100% 99%);
+    }
+
+    66.01% {
+        background-color: red;
+    }
+
+    75% {
+        clip-path: polygon(50% 50%, 50% 0, 100% 0, 100% 50%, 100% 50%);
+    }
+
+    75.01% {
+        clip-path: polygon(50% 50%, 50% 0, 100% 0, 100% 49%);
+    }
+
+    88% {
+        clip-path: polygon(50% 50%, 50% 0, 100% 0, 100% 0%);
+    }
+    88.01% {
+        clip-path: polygon(50% 50%, 50% 0, 99% 0);
+    }
+
+    100% {
+        clip-path: polygon(50% 50%, 50% 0, 50% 0);
+        background-color: red;
+    }
+}
