@@ -1,285 +1,334 @@
+<!-- admin.ejs -->
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-	<meta charset="UTF-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>Admin Page</title>
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-	<style>
-		table {
-			border-collapse: collapse;
-			width: 100%;
-		}
-
-		th,
-		td {
-			border: 1px solid #000;
-			/* Solid border */
-			text-align: left;
-			padding: 8px;
-		}
-
-		th {
-			background-color: #f2f2f2;
-		}
-
-		.pagination {
-			display: flex;
-			justify-content: center;
-			margin-top: 20px;
-		}
-
-		.pagination button {
-			margin: 0 5px;
-			cursor: pointer;
-			padding: 5px 10px;
-		}
-
-		.active {
-			background-color: #007bff;
-			color: white;
-		}
-	</style>
-</head>
-
-<body>
-	<h1>Admin Page</h1>
-	<button onclick="logout()">Logout</button>
-	<br>
-	<hr>
-	<label for="">Add more question: </label>
-	<button onclick="addRow()">Add</button>
-	<br />
-	<br />
-	<label for="">Filter by Type: </label>
-	<select id="typeFilter" onchange="filterByType()">
-		<option value="">All</option>
-		<option value="easy">easy</option>
-		<option value="medium">medium</option>
-		<option value="hard">hard</option>
-		<!-- Add more options for each type -->
-	</select>
-	<span id="filterCount"></span>
-	<br />
-	<br />
-	<div id="pagination"></div>
-	<table id="dataTable">
-		<thead>
-			<tr>
-				<th>Id</th>
-				<th>Type</th>
-				<th>Difficulty</th>
-				<th>Category</th>
-				<th>Question</th>
-				<th>Correct Answer</th>
-				<th>Incorrect Answers</th>
-				<th>Action</th>
-			</tr>
-		</thead>
-		<tbody>
-			<!-- Question rows will be added here dynamically -->
-		</tbody>
-	</table>
-
-	<script>
-
-		// Function to add a new row
-		function addRow() {
-			const table = document
-				.getElementById("dataTable")
-				.getElementsByTagName("tbody")[0];
-			const newRow = table.insertRow(table.rows.length);
-
-			// Insert cells with input fields
-			const cellCount = 8; // Assuming 8 cells per row
-			for (let i = 0; i < cellCount; i++) {
-				const cell = newRow.insertCell(i);
-				if (i === cellCount - 1) {
-					// Add save button in the last cell
-					const saveBtn = document.createElement("button");
-					saveBtn.textContent = "Save";
-					saveBtn.onclick = () => saveRow(newRow);
-					cell.appendChild(saveBtn);
-				} else {
-					// Add input fields for other cells
-					const input = document.createElement("input");
-					input.type = "text";
-					input.placeholder = "Enter value";
-					cell.appendChild(input);
-				}
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+		<title>Admin Page</title>
+		<style>
+			table {
+				border-collapse: collapse;
+				width: 100%;
 			}
-			// Scroll to the newly inserted row
-			window.scrollTo(0, document.body.scrollHeight);
-		}
-
-		function deleteRow(button) {
-			const row = button.parentNode.parentNode;
-			const id = row.cells[0].textContent; // Assuming ID is in the first cell
-			const confirmation = confirm(
-				"Are you sure you want to delete this question?"
-			);
-
-			if (confirmation) {
-				// Send an AJAX request to delete the question
-				const xhr = new XMLHttpRequest();
-				xhr.open("POST", "/admin/deleteQuestion", true);
-				xhr.setRequestHeader("Content-Type", "application/json");
-				xhr.onload = function () {
-					if (xhr.status === 200) {
-						console.log("Question deleted successfully");
-						// Remove the row from the UI after successful deletion
-						row.parentNode.removeChild(row);
-					} else {
-						console.error("Error deleting question");
-					}
-				};
-				xhr.send(JSON.stringify({ id: id }));
+			th,
+			td {
+				border: 1px solid #000; /* Solid border */
+				text-align: left;
+				padding: 8px;
 			}
-		}
-
-		// Function to save data from a row
-		function saveRow(row) {
-			const inputs = row.querySelectorAll('input[type="text"]');
-			const rowData = Array.from(inputs).map((input) => input.value);
-
-			// Send data to server
-			fetch("/admin/addQuestion", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({ rowData: rowData }),
-			})
-				.then((response) => {
-					if (response.ok) {
-						console.log("Question added successfully");
-						// Redirect to admin page after successful save
-						window.location.href = "/admin";
-					} else {
-						console.error("Error adding question");
-					}
+			th {
+				background-color: #f2f2f2;
+			}
+			.pagination {
+				display: flex;
+				justify-content: center;
+				margin-top: 20px;
+			}
+			.pagination button {
+				margin: 0 5px;
+				cursor: pointer;
+				padding: 5px 10px;
+			}
+			.active {
+				background-color: #007bff;
+				color: white;
+			}
+			/* CSS for current page button */
+			.current-page {
+				background-color: #007bff; /* Blue background color */
+				color: white; /* Text color */
+				font-weight: bold; /* Bold text font */
+				border: 1px solid #007bff; /* Blue border */
+				border-radius: 5px; /* Rounded corners */
+				padding: 5px 10px; /* Padding */
+				margin: 0 3px; /* Margin */
+			}
+		</style>
+	</head>
+	<body>
+		<h1>Admin Page</h1>
+		<button onclick="logout()">Logout</button>
+		<br><hr>
+		<label for="">Add more question: </label
+		><button onclick="addRow()">Add</button>
+		<br />
+		<br />
+		<label for="">Filter by Difficulty: </label>
+		<select id="typeFilter" onchange="filterByType()">
+			<option value="">All</option>
+			<option value="easy">easy</option>
+			<option value="medium">medium</option>
+			<option value="hard">hard</option>
+			<!-- Add more options for each type -->
+		</select>
+		<span id="filterCount"></span>
+		<br />
+		<br />
+		<table id="dataTable">
+			<thead>
+				<tr>
+					<th>Id</th>
+					<th>Type</th>
+					<th>Difficulty</th>
+					<th>Category</th>
+					<th>Question</th>
+					<th>Correct Answer</th>
+					<th>Incorrect Answers</th>
+					<th>Action</th>
+				</tr>
+			</thead>
+			<tbody>
+				<% questions.forEach(question => { %>
+				<tr>
+					<td><%= question.id %></td>
+					<td><%= question.type %></td>
+					<td><%= question.difficulty %></td>
+					<td><%= question.category %></td>
+					<td><%= question.question %></td>
+					<td><%= question.correct_answer %></td>
+					<td><%= question.incorrect_answers.join(', ') %></td>
+					<td><button onclick="deleteRow(this)">Delete</button></td>
+				</tr>
+				<% }); %>
+			</tbody>
+		</table>
+		<div class="pagination">
+			<button id="prevBtn" onclick="prevPage()">Previous</button>
+			<div id="pageButtons"></div>
+			<button id="nextBtn" onclick="nextPage()">Next</button>
+		</div>
+		<script>
+			function logout() {
+				console.log('logout click')
+				$.post('/userAction', {
+					"action" : "Logout"
 				})
-				.catch((error) => console.error("Error:", error));
-		}
+				.done((res)=>{
+					window.location.href = '/'
+				})
+			}
+			// Function to add a new row
+			function addRow() {
+				const table = document
+					.getElementById("dataTable")
+					.getElementsByTagName("tbody")[0];
+				const newRow = table.insertRow(table.rows.length);
 
-		// Function to filter questions by type
-		function filterByType() {
-			const selectedType = document.getElementById("typeFilter").value;
-			const rows = document
-				.getElementById("dataTable")
-				.getElementsByTagName("tr");
-			let count = 0; // Variable to store the count of filtered rows
+				// Insert cells with input fields
+				const cellCount = 8; // Assuming 8 cells per row
+				for (let i = 0; i < cellCount; i++) {
+					const cell = newRow.insertCell(i);
+					if (i === cellCount - 1) {
+						// Add save button in the last cell
+						const saveBtn = document.createElement("button");
+						saveBtn.textContent = "Save";
+						saveBtn.onclick = () => saveRow(newRow);
+						cell.appendChild(saveBtn);
+					} else {
+						// Add input fields for other cells
+						const input = document.createElement("input");
+						input.type = "text";
+						input.placeholder = "Enter value";
+						cell.appendChild(input);
+					}
+				}
+				// Scroll to the newly inserted row
+				window.scrollTo(0, document.body.scrollHeight);
+			}
 
-			for (let i = 1; i < rows.length; i++) {
-				// Start from index 1 to skip the header row
-				const typeCell = rows[i].cells[2]; // Assuming type is in the second cell of each row
+			function deleteRow(button) {
+				const row = button.parentNode.parentNode;
+				const id = row.cells[0].textContent; // Assuming ID is in the first cell
+				const confirmation = confirm(
+					"Are you sure you want to delete this question?"
+				);
 
-				if (selectedType === "" || typeCell.textContent === selectedType) {
-					rows[i].style.display = "";
-					count++; // Increment the count if the row matches the filter
-				} else {
-					rows[i].style.display = "none";
+				if (confirmation) {
+					// Send an AJAX request to delete the question
+					const xhr = new XMLHttpRequest();
+					xhr.open("POST", "/admin/deleteQuestion", true);
+					xhr.setRequestHeader("Content-Type", "application/json");
+					xhr.onload = function () {
+						if (xhr.status === 200) {
+							console.log("Question deleted successfully");
+							// Remove the row from the UI after successful deletion
+							row.parentNode.removeChild(row);
+						} else {
+							console.error("Error deleting question");
+						}
+					};
+					xhr.send(JSON.stringify({ id: id }));
 				}
 			}
 
-			// Update the filter count in the HTML
-			document.getElementById("filterCount").textContent = `(${count} result${count !== 1 ? "s" : ""
+			// Function to save data from a row
+			function saveRow(row) {
+				const inputs = row.querySelectorAll('input[type="text"]');
+				const rowData = Array.from(inputs).map((input) => input.value);
+
+				// Send data to server
+				fetch("/admin/addQuestion", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({ rowData: rowData }),
+				})
+					.then((response) => {
+						if (response.ok) {
+							console.log("Question added successfully");
+							// Redirect to admin page after successful save
+							window.location.href = "/admin";
+						} else {
+							console.error("Error adding question");
+						}
+					})
+					.catch((error) => console.error("Error:", error));
+			}
+
+			// Function to filter questions by type
+			function filterByType() {
+				const selectedType = document.getElementById("typeFilter").value;
+				const rows = document
+					.getElementById("dataTable")
+					.getElementsByTagName("tr");
+				let count = 0; // Variable to store the count of filtered rows
+
+				for (let i = 1; i < rows.length; i++) {
+					// Start from index 1 to skip the header row
+					const typeCell = rows[i].cells[2]; // Assuming type is in the second cell of each row
+
+					if (selectedType === "" || typeCell.textContent === selectedType) {
+						rows[i].style.display = "";
+						count++; // Increment the count if the row matches the filter
+					} else {
+						rows[i].style.display = "none";
+					}
+				}
+
+				// Update the filter count in the HTML
+				document.getElementById("filterCount").textContent = `(${count} result${
+					count !== 1 ? "s" : ""
 				})`;
-		}
-
-		// Logout function
-		function logout() {
-			$.post('/userAction', {
-				'action': 'Logout'
-			}).done((res) => {
-				console.log(res)
-				window.location.href = '/';
-			})
-		}
-
-		function renderPagination(itemsPerPage, currentPage, totalQuestions) {
-			const totalPages = Math.ceil(totalQuestions / itemsPerPage);
-			const paginationContainer = document.getElementById("pagination");
-			paginationContainer.innerHTML = ""; // Clear previous pagination buttons
-
-			for (let i = 1; i <= totalPages; i++) {
-				const button = document.createElement("button");
-				button.textContent = i;
-				button.classList.add("pagination-button");
-
-				if (i === currentPage) {
-					button.classList.add("active");
-				}
-
-				button.onclick = () => {
-					displayQuestions(adminData.questions, itemsPerPage, i);
-					highlightActiveButton(i);
-					window.scrollTo(0, 0); // Scroll to top after changing page
-				};
-
-				paginationContainer.appendChild(button);
 			}
-		}
+			//PAGINATION
+			let currentPage = 1; // Current page number
+			const rowsPerPage = 100; // Number of rows per page
 
-		function highlightActiveButton(currentPage) {
-			const buttons = document.querySelectorAll(".pagination-button");
-			buttons.forEach(button => {
-				button.classList.remove("active");
-				if (parseInt(button.textContent) === currentPage) {
-					button.classList.add("active");
+			// Function to get total number of pages based on total number of rows
+			function getTotalPages() {
+				const totalRows =
+					document.getElementById("dataTable").getElementsByTagName("tr")
+						.length - 1; // Exclude header row
+				return Math.ceil(totalRows / rowsPerPage);
+			}
+
+			// Function to display rows for the current page
+			function displayRows() {
+				const rows = document
+					.getElementById("dataTable")
+					.getElementsByTagName("tr");
+				const startIndex = (currentPage - 1) * rowsPerPage + 1; // Start index of rows for current page
+				const endIndex = Math.min(
+					startIndex + rowsPerPage - 1,
+					rows.length - 1
+				); // End index of rows for current page
+
+				for (let i = 1; i < rows.length; i++) {
+					rows[i].style.display =
+						i >= startIndex && i <= endIndex ? "" : "none";
 				}
-			});
-		}
-	
-		var adminData;
-		function fetchDataAndDisplay() {
-            fetch('/admin/questionsData')
-                .then(response => response.json())
-                .then(data => {
-					adminData = data
-                    const questions = data.questions;
-                    const itemsPerPage = data.itemsPerPage;
-                    const currentPage = data.currentPage;
-                    
-                    // Call functions to display questions and pagination
-                    displayQuestions(questions, itemsPerPage, currentPage);
-                    renderPagination(itemsPerPage, currentPage, questions.length);
-                })
-                .catch(error => console.error('Error fetching data:', error));
-        }
 
-        // Function to display questions
-        function displayQuestions(questions, itemsPerPage, currentPage) {
-            // Clear previous content
-            const tableBody = document.querySelector("#dataTable tbody");
-            tableBody.innerHTML = "";
+				updatePaginationButtons(); // Update pagination buttons
+			}
 
-            // Calculate start and end indices for pagination
-            const startIndex = (currentPage - 1) * itemsPerPage;
-            const endIndex = Math.min(startIndex + itemsPerPage, questions.length);
-			console.log('aa', startIndex,endIndex)
-            // Loop through questions to display
-            for (let i = startIndex; i < endIndex; i++) {
-                const question = questions[i];
-                const row = document.createElement("tr");
-                row.innerHTML = `
-                    <td>${question.id}</td>
-                    <td>${question.type}</td>
-                    <td>${question.difficulty}</td>
-                    <td>${question.category}</td>
-                    <td>${question.question}</td>
-                    <td>${question.correct_answer}</td>
-                    <td>${question.incorrect_answers.join(', ')}</td>
-                    <td><button onclick="deleteRow(this)">Delete</button></td>
-                `;
-                tableBody.appendChild(row);
-            }
-        }
-	
-		 // Call the function to fetch data and display on page load
-		 fetchDataAndDisplay();
-	</script>
-</body>
+			// Function to navigate to previous page
+			function prevPage() {
+				if (currentPage > 1) {
+					currentPage--;
+					displayRows();
+				}
+			}
 
+			// Function to navigate to next page
+			function nextPage() {
+				if (currentPage < getTotalPages()) {
+					currentPage++;
+					displayRows();
+				}
+			}
+
+			// Function to generate page number buttons
+			function generatePageButtons() {
+				const pageButtonsContainer = document.getElementById("pageButtons");
+				pageButtonsContainer.innerHTML = ""; // Clear existing buttons
+
+				const totalPages = getTotalPages();
+
+				// Generate button for previous page
+				if (!document.getElementById("prevBtn")) {
+					const prevBtn = document.createElement("button");
+					prevBtn.textContent = "Previous";
+					prevBtn.id = "prevBtn";
+					prevBtn.onclick = prevPage;
+					pageButtonsContainer.appendChild(prevBtn);
+				}
+
+				// Calculate the range of page numbers to display
+				let startPage = Math.max(1, currentPage - 3);
+				let endPage = Math.min(totalPages, currentPage + 3);
+
+				// Adjust startPage and endPage if there are less than 6 pages in total
+				if (totalPages < 6) {
+					startPage = 1;
+					endPage = totalPages;
+				} else {
+					if (currentPage < 4) {
+						endPage = 6;
+					} else if (currentPage > totalPages - 3) {
+						startPage = totalPages - 5;
+					}
+				}
+
+				// Generate buttons for the page numbers
+				for (let i = startPage; i <= endPage; i++) {
+					const button = document.createElement("button");
+					button.textContent = i;
+					button.onclick = function () {
+						currentPage = i;
+						displayRows();
+					};
+					if (i === currentPage) {
+						button.classList.add("current-page"); // Add CSS class for current page button
+					}
+					pageButtonsContainer.appendChild(button);
+				}
+
+				// Generate button for next page
+				if (!document.getElementById("nextBtn")) {
+					const nextBtn = document.createElement("button");
+					nextBtn.textContent = "Next";
+					nextBtn.id = "nextBtn";
+					nextBtn.onclick = nextPage;
+					pageButtonsContainer.appendChild(nextBtn);
+				}
+			}
+
+			// Function to update pagination buttons based on current page
+			function updatePaginationButtons() {
+				const prevBtn = document.getElementById("prevBtn");
+				const nextBtn = document.getElementById("nextBtn");
+
+				prevBtn.style.display = currentPage == 1 ? "none" : "inline";
+				nextBtn.style.display =
+					currentPage == getTotalPages() ? "none" : "inline";
+
+				generatePageButtons(); // Generate page number buttons
+			}
+
+			// Initial display of rows and pagination buttons
+			displayRows();
+		</script>
+	</body>
 </html>

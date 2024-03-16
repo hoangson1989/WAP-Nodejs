@@ -11,8 +11,10 @@ const option = {
 const adminRouter = express.Router(option);
 
 adminRouter.get("/", (req, res) => {
-	console.log('render admin')
-	res.render("admin");
+	const jsonData = questionManager.getData();
+	const itemsPerPage = 20; // Define items per page
+	const currentPage = req.query.page || 1; // Current page from query parameter, default to 1 if not provided
+	res.render("admin",{ questions: jsonData, itemsPerPage, currentPage });
 });
 
 adminRouter.get('/questionsData',(req, res) => {

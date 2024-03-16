@@ -41,7 +41,7 @@
 		<script>
 			$(document).ready(function () {
 				// const username = getCookie("username"); // Get the username from the cookie
-				const username = getCookie("username");
+				const username = getCookie("user").username;
 				if (username) {
 					$("#historyTitle").text(`Playing history of ${username}`);
 				}
@@ -108,7 +108,7 @@
 				></h1>
 			</div>
 			<div id="backButton">
-				<a href="/profile"><button>Back to Profile</button></a>
+				<a href="/"><button>Back to Profile</button></a>
 			</div>
 		</div>
 	</body>
