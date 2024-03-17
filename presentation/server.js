@@ -104,23 +104,25 @@ app.post("/login", function (req, res) {
 	let username = req.body.username;
 	let password = req.body.password;
 	let action = req.body.action;
+	console.log("body", req.body)
 
 	if (action == "Register") {
 		let newUser = userManager.registerUser(username, password);
 		if (newUser != null) {
 			res.cookie("user", newUser);
-			res.redirect("/");
+			res.json({result: true, user: newUser})
 		} else {
-			res.send("User is already exist");
+			res.json({result: false, message: "User is already exist"})
 		}
 	} else {
 		let user = userManager.loginUser(username, password);
 		if (user != null) {
 			res.cookie("username", user.username);
 			res.cookie("user", user);
-			res.redirect('/')
+			console.log("login", user)
+			res.json({result: true, user: user})
 		} else {
-			res.send("User doesn't exist");
+			res.json({result: false, message: "User doesn't exist"})
 		}
 	}
 });

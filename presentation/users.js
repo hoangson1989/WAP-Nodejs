@@ -37,7 +37,7 @@ class User {
 
     registerUser(username, password) {
         for (let usr of this.data) {
-            if (usr.username == username && usr.password == password) {
+            if (usr.username == username) {
                 return null
             }
         }
