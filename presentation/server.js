@@ -151,7 +151,7 @@ app.get(`/ranking`, (req, res) => {
 	let ranks = [];
 
 	for (let ele of userData) {
-		if (ele.type == `user`) {
+		if (ele.type == `user` && ele.history.length!=0) {
 			ele.history.sort((a, b) => b.score - a.score);
 
 			let object = {};

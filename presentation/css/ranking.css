@@ -42,6 +42,14 @@ img#icon {
     bottom: 200px; /* Adjust the distance from the bottom as needed */
     left: 50%; /* Place it at 50% from the left */
     transform: translateX(-50%); /* Center it horizontally */
+    width: 10%;
+    height: 40px;
+    font-size: medium;
+    border: 1px solid green;
+    background-color: white;
+}
+#backButton:hover{
+    background-color: greenyellow;
 }
 #ranking {
     max-height: 500px; /* Set maximum height to limit the size of the ranking area */
