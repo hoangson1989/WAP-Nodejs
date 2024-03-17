@@ -108,6 +108,7 @@ app.post("/login", function (req, res) {
 		let newUser = userManager.registerUser(username, password);
 		if (newUser != null) {
 			res.cookie("user", newUser);
+			res.cookie(`username`, newUser.username);
 			res.json({ result: true, user: newUser });
 		} else {
 			res.json({ result: false, message: "User is already exist" });
@@ -151,12 +152,17 @@ app.get(`/ranking`, (req, res) => {
 	let ranks = [];
 
 	for (let ele of userData) {
-		if (ele.type == `user` && ele.history.length!=0) {
+		if (ele.type == `user` && ele.history.length != 0) {
 			ele.history.sort((a, b) => b.score - a.score);
 
 			let object = {};
 			object.username = ele.username;
 			object.score = ele.history[0].score;
+			ranks.push(object);
+		}else if(ele.type == `user` && ele.history.length == 0){
+			let object = {};
+			object.username = ele.username;
+			object.score = 0;
 			ranks.push(object);
 		}
 	}
