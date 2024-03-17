@@ -19,17 +19,17 @@
         function timeout() {
             console.log('timeout')
             timeoutID = null
-            $.post('/answerQuestion', { question: JSON.stringify(currentQuestion), answer: ''})
+            $.post('/answerQuestion', { question: JSON.stringify(currentQuestion), answer: '' })
             endGame(false)
         }
 
         function endGame(isWin) {
-            $('#gameplay').css('visibility','hidden')
-            $('#awards').css('visibility','hidden')
+            $('#gameplay').css('visibility', 'hidden')
+            $('#awards').css('visibility', 'hidden')
             if (isWin) {
-                $('#success').css('visibility','visible')
+                $('#success').css('visibility', 'visible')
             } else {
-                $('#failure').css('visibility','visible')
+                $('#failure').css('visibility', 'visible')
             }
             setTimeout(() => {
                 window.location.href = '/'
@@ -49,12 +49,12 @@
                             $(sender).css('background-color', 'green')
                             //
                             if (currentPrice != null) {
-                                $(currentPrice).css('color','yellow')
-                                $(currentPrice).css('background-color','')
+                                $(currentPrice).css('color', 'yellow')
+                                $(currentPrice).css('background-color', '')
                             }
                             let prices = $('label[name="price"]')
                             currentPrice = prices[prices.length - questionNumber]
-                            $(currentPrice).css('background-color','yellow')
+                            $(currentPrice).css('background-color', 'yellow')
                             //
                             questionNumber++
                             if (questionNumber == 6) {
@@ -62,22 +62,22 @@
                             } else if (questionNumber == 11) {
                                 level = 'hard'
                             }
-                            //
+
                             setTimeout(() => {
                                 if (questionNumber <= 15) {
                                     getQuestion()
-
                                 } else {
                                     endGame(true)
                                 }
-                            }, 2000);
+                            }, 4000);
                         } else {
                             $(sender).css('background-color', 'red')
                             setTimeout(() => {
                                 endGame(false)
-                            }, 2000);
+                            }, 4000);
                         }
-
+                        //
+                        playSound(data.result)
                         //
                     }, 2000);
                 }).fail(function (xhr, status, error) {
@@ -139,6 +139,18 @@
             }, 10);
         }
 
+        function playSound(flag) {
+            if (flag) {
+                var audio = document.getElementById("rightSound");
+
+                audio.play();
+            } else {
+                var audio = document.getElementById("wrongSound");
+
+                audio.play();
+            }
+        }
+
         $(document).ready(() => {
             pauseAnimation()
             getQuestion();
@@ -147,6 +159,21 @@
 </head>
 
 <body>
+    <audio id="backgroundSound" loop autoplay>
+        <source src="/sound/background.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+
+    <audio id="rightSound">
+        <source src="/sound/right.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+
+    <audio id="wrongSound">
+        <source src="/sound/wrong.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+
     <div id="content">
         <img id="bg" src="/images/millionaire01.jpg">
         <img id="icon" style="position: absolute;"
@@ -181,7 +208,7 @@
             <label name="price" style="font-size: 28px;">$500.000</label>
             <label name="price" style="font-size: 26px;">$400.000</label>
             <label name="price" style="font-size: 25px;">$300.000</label>
-            <label name="price"  style="font-size: 24px;">$200.000</label>
+            <label name="price" style="font-size: 24px;">$200.000</label>
 
             <label name="price" style="font-size: 23px;">$100.000</label>
             <label name="price" style="font-size: 22px;">$50.000</label>
