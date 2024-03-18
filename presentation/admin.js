@@ -13,12 +13,53 @@ const adminRouter = express.Router(option);
 // Load the question data when the server starts
 questionManager.loadData();
 
-adminRouter.get("/", (req, res) => {
-	// Get the questions data
-	const questions = questionManager.getData();
-	// Pass the data and pagination variables to the EJS template
-	res.render("admin", { questions });
-});
+// adminRouter.get("/", (req, res) => {
+// 	// Get the questions data
+// 	const questions = questionManager.getData();
+// 	// Pass the data and pagination variables to the EJS template
+// 	res.render("admin", { questions });
+// });
+
+adminRouter.get("/", (req, res, next) => {
+	res.sendFile(path.join(__dirname, "views", "admin.html"));
+})
+
+adminRouter.get("/question", (req, res, next) => {
+	let questions = questionManager.getData();
+	// console.log(questions);
+	res.send({ total: questions.length, totalNotFiltered: questions.length, rows: questions });
+})
+
+//add new question
+adminRouter.post("/question", (req, res, next) => {
+	console.log('post', req.body)
+	// to do validation
+	let payload = req.body;
+	let dto = {type: payload.type, category: payload.category, difficulty: payload.difficulty, question: payload.question, correct_answer: payload.correct_answer};
+	dto.incorrect_answers = [payload.incorrect_answers1, payload.incorrect_answers2, payload.incorrect_answers3];
+	let newQuestion = questionManager.insertOrUpdate(dto);
+	res.status(200).send(newQuestion);
+})
+
+//edit
+adminRouter.put("/question", (req, res, next) => {
+	console.log('put', req.body)
+	// to do validation
+	let payload = req.body;
+	let dto = {id: payload.id, type: payload.type, category: payload.category, difficulty: payload.difficulty, question: payload.question, correct_answer: payload.correct_answer};
+	dto.incorrect_answers = [payload.incorrect_answers1, payload.incorrect_answers2, payload.incorrect_answers3];
+	let newQuestion = questionManager.insertOrUpdate(dto);
+	res.status(200).send(newQuestion);
+})
+
+//delete
+adminRouter.delete("/question", (req, res, next) => {
+	console.log('delete', req.body)
+	// res.redirect("back");
+	questionManager.delete(req.body.id);
+	res.status(200).send(req.body);
+})
+
 
 // Endpoint to delete a question
 adminRouter.post("/deleteQuestion", (req, res) => {
@@ -61,7 +102,7 @@ adminRouter.post("/addQuestion", (req, res) => {
 	questionManager.save();
 	res.render(`admin`, { questions: questionManager.getData() });
 
-	
+
 });
 
 module.exports = adminRouter;
