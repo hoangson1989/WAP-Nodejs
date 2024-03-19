@@ -19,21 +19,21 @@
         function timeout() {
             console.log('timeout')
             timeoutID = null
-            // $.post('/answerQuestion', { question: JSON.stringify(currentQuestion), answer: '' })
+            $.post('/answerQuestion', { question: JSON.stringify(currentQuestion), answer: '' })
             endGame(false)
         }
 
         function endGame(isWin) {
-            // $('#gameplay').css('visibility', 'hidden')
-            // $('#awards').css('visibility', 'hidden')
-            // if (isWin) {
-            //     $('#success').css('visibility', 'visible')
-            // } else {
-            //     $('#failure').css('visibility', 'visible')
-            // }
-            // setTimeout(() => {
-            //     window.location.href = '/'
-            // }, 2000);
+            $('#gameplay').css('visibility', 'hidden')
+            $('#awards').css('visibility', 'hidden')
+            if (isWin) {
+                $('#success').css('visibility', 'visible')
+            } else {
+                $('#failure').css('visibility', 'visible')
+            }
+            setTimeout(() => {
+                window.location.href = '/'
+            }, 2000);
         }
 
         function answer(sender) {
