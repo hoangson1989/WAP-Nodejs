@@ -51,7 +51,8 @@ app.get("/player", function (req, res) {
 	res.render("player", { user: user, actions: userActions });
 });
 app.get("/game", function (req, res) {
-	res.render("game");
+	console.log(req.cookies.helps)
+	res.render("game",req.cookies.helps);
 });
 
 app.get("/getQuestion", (req, res) => {
@@ -142,9 +143,18 @@ app.post("/userAction", function (req, res) {
 		res.redirect("/ranking");
 	} else if (action == "New Game") {
 		res.clearCookie("olds");
+		res.cookie('helps',{half: true, change: true, audiences : true})
 		res.redirect("/game");
 	}
 });
+
+app.post('/useHelp',function(req, res) {
+	let type = req.body.type
+	let cookies = req.cookies.helps
+	cookies[type] = false
+	res.cookie('helps',cookies)
+	res.json({result: true})
+})
 
 app.get(`/ranking`, (req, res) => {
 	let userData = userManager.getData();
@@ -190,10 +200,6 @@ app.get(`/history`, (req, res) => {
 	const top10Latest = history.slice(0, 10);
 
 	res.render(`history`, { top10Latest, username });
-});
-
-app.get(`/game`, (req, res) => {
-	res.render(`game`);
 });
 
 app.use(`/admin`, adminRouter);

@@ -19,25 +19,25 @@
         function timeout() {
             console.log('timeout')
             timeoutID = null
-            $.post('/answerQuestion', { question: JSON.stringify(currentQuestion), answer: '' })
+            // $.post('/answerQuestion', { question: JSON.stringify(currentQuestion), answer: '' })
             endGame(false)
         }
 
         function endGame(isWin) {
-            $('#gameplay').css('visibility', 'hidden')
-            $('#awards').css('visibility', 'hidden')
-            if (isWin) {
-                $('#success').css('visibility', 'visible')
-            } else {
-                $('#failure').css('visibility', 'visible')
-            }
-            setTimeout(() => {
-                window.location.href = '/'
-            }, 2000);
+            // $('#gameplay').css('visibility', 'hidden')
+            // $('#awards').css('visibility', 'hidden')
+            // if (isWin) {
+            //     $('#success').css('visibility', 'visible')
+            // } else {
+            //     $('#failure').css('visibility', 'visible')
+            // }
+            // setTimeout(() => {
+            //     window.location.href = '/'
+            // }, 2000);
         }
 
         function answer(sender) {
-            if (selectedDiv == null) {
+            if (selectedDiv == null &&  $(sender).html().length > 0) {
                 selectedDiv = sender
                 let userAnswer = $(sender).html().split(": ")[1]
                 $(sender).css('background-color', 'burlywood')
@@ -91,6 +91,8 @@
         }
 
         function getQuestion() {
+            $('#audiences').css('visibility','hidden')
+
             if (selectedDiv != null) {
                 $(selectedDiv).css('background-color', '')
                 selectedDiv = null
@@ -132,6 +134,7 @@
 
         function resetAnimation() {
             $('#progress').css('animation', 'none');
+            $('#progress').css('clip-path', 'polygon(50% 50%, 50% 0, 100% 0, 100% 50%, 100% 100%, 50% 100%, 0% 100%, 0% 50%, 0% 0%, 50% 0%)')
             setTimeout(function () {
                 $('#progress').css('animation', 'countdown-fill 60s linear forwards');
                 $('#progress').css('animation-play-state', 'running');
@@ -149,6 +152,63 @@
 
                 audio.play();
             }
+        }
+
+        function chooseHelp(sender, type) {
+            console.log('click click')
+            $(sender).removeAttr('onclick');
+            $.post('/useHelp', { type: type }, function (res) {
+                $(sender).css('border-color', 'red')
+                //
+                if (type == 'change') {
+                    pauseAnimation()
+                    getQuestion()
+                } else if (type == 'half') {
+                    let count = 0;
+                    let correctAns = currentQuestion.correct_answer
+                    let divs = $('div.answer')
+                    while (count < 2) {
+                        const randomIndex = Math.floor(Math.random() * divs.length);
+                        let divText = $(divs[randomIndex]).html()
+                        if (divText.length > 0 && divText.includes(correctAns) == false) {
+                            count++
+                            $(divs[randomIndex]).html('')
+                        }
+                    }
+                } else {
+                    let names = ['Chi',
+                    'Quyen','Son','Thinh','Sonny','Linh'
+                    ,'Vien','Tom','Steven','Andrew','Micheal'
+                    ,'Sean','Mike','Phong','Quang','Lucy',
+                    'Phi','Lan','Jessia','Rambo','Rocky']
+                    $('#audiences').css('visibility','visible')
+                    let options = ['A', 'B' , 'C', 'D']
+                    let counts = {}
+                    let time = 300
+                    for (let i = 0 ; i < names.length; i++) {
+                        setTimeout(() => {
+                            const randomIndex = Math.floor(Math.random() * 4);
+                            let key = options[randomIndex];
+                            counts[key] = counts[key] == undefined ? 1 : counts[key] + 1
+                            $('#audiences').append(`<label>${names[i]}: ${key}</><br>`)
+                        }, i * time);
+                    }
+                    setTimeout(() => {
+                        let total = 0;
+                        for (let key in counts) {
+                            total += counts[key]
+                        }
+                        $('#audiences').append('<br>')
+                        for (let i = 0; i < options.length ; i++) {
+                            let val = parseInt((counts[options[i]] * 100) / total)
+                            $('#audiences').append(`<label>${options[i]}: ${val}% &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</>`)
+                            if (i == 1) {
+                                $('#audiences').append('<br>')
+                            }
+                        }
+                    }, (names.length) * time );
+                }
+            })
         }
 
         $(document).ready(() => {
@@ -180,6 +240,38 @@
             src="/images/who-wants-to-be-a-millionaire-2014-millionaire-2017-game-show-quiz-android-thumbnail.png">
 
         <div id="gameplay">
+            <div id="helps" style="padding: 20px;position: absolute; top: 0; left: 0; display: flex; gap: 20px;">
+                <% if (half) { %>
+                    <div onclick="chooseHelp(this,'half')"
+                        style="padding-top: 8px;width: 100px; height: 30px; border-radius: 50%; border: 1px solid green;">
+                        50:50</div>
+                    <% } else { %>
+                        <div
+                            style="padding-top: 8px;width: 100px; height: 30px; border-radius: 50%; border: 1px solid red;">
+                            50:50</div>
+                        <% } %>
+
+                            <% if (change) { %>
+                                <div onclick="chooseHelp(this,'change')"
+                                    style="padding-top: 8px;width: 100px; height: 30px; border-radius: 50%; border: 1px solid green;">
+                                    Change</div>
+                                <% } else { %>
+                                    <div
+                                        style="padding-top: 8px;width: 100px; height: 30px; border-radius: 50%; border: 1px solid red;">
+                                        Change</div>
+                                    <% } %>
+
+                                        <% if (audiences) { %>
+                                            <div onclick="chooseHelp(this,'audiences')"
+                                                style="padding-top: 8px;width: 100px; height: 30px; border-radius: 50%; border: 1px solid green;">
+                                                Audiences</div>
+                                            <% } else { %>
+                                                <div
+                                                    style="padding-top: 8px;width: 100px; height: 30px; border-radius: 50%; border: 1px solid red;">
+                                                    Audiences</div>
+                                                <% } %>
+
+            </div>
             <h3 id="question" style="text-align: center;"> This is Question</h3>
             <div id="answers">
                 <div class="answer" onclick="answer(this)">Lorem ipsum dolor sit amet consectetur adipisicing elit.
@@ -221,6 +313,9 @@
             <label name="price" style="font-size: 18px;">$5.000</label>
             <label name="price" style="font-size: 18px;">$2.000</label>
             <label name="price" style="font-size: 18px;">$1.000</label>
+
+        </div>
+        <div id="audiences">
 
         </div>
     </div>
