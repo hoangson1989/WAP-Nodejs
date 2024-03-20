@@ -52,9 +52,10 @@ app.get("/player", function (req, res) {
 });
 app.get("/game", function (req, res) {
 	console.log(req.cookies.helps)
-	res.render("game",req.cookies.helps);
+	res.render("game", req.cookies.helps);
 });
 
+let currentQuestion;
 app.get("/getQuestion", (req, res) => {
 	const jsonData = questionManager.getData();
 	let oldQuestionIDs = req.cookies.olds;
@@ -68,10 +69,18 @@ app.get("/getQuestion", (req, res) => {
 	});
 
 	if (array.length > 0) {
-		const randomIndex = Math.floor(Math.random() * array.length);
+		let randomIndex = Math.floor(Math.random() * array.length);
 		let obj = array[randomIndex];
+		
+		let answers = obj.incorrect_answers
+		randomIndex = Math.floor(Math.random() * (answers.length + 1));
+		answers.splice(randomIndex, 0, obj.correct_answer);
+
+		currentQuestion = { ...obj };
+		currentQuestion.answers = answers
+
 		console.log("Question", obj);
-		res.json(obj);
+		res.json( { question: obj.question, answers: answers });
 	} else {
 		res.json({});
 	}
@@ -143,17 +152,31 @@ app.post("/userAction", function (req, res) {
 		res.redirect("/ranking");
 	} else if (action == "New Game") {
 		res.clearCookie("olds");
-		res.cookie('helps',{half: true, change: true, audiences : true})
+		res.cookie('helps', { half: true, change: true, audiences: true })
 		res.redirect("/game");
 	}
 });
 
-app.post('/useHelp',function(req, res) {
+app.post('/useHelp', function (req, res) {
 	let type = req.body.type
 	let cookies = req.cookies.helps
 	cookies[type] = false
-	res.cookie('helps',cookies)
-	res.json({result: true})
+	res.cookie('helps', cookies)
+	if (type == 'half') {
+		let correctAns = currentQuestion.correct_answer
+		let indexs = []
+		while (indexs.length < 2) {
+			const randomIndex = Math.floor(Math.random() * currentQuestion.answers.length);
+			let divText = currentQuestion.answers[randomIndex]
+			if (divText.length > 0 && divText.includes(correctAns) == false) {
+				indexs.push(randomIndex)
+				currentQuestion.answers[randomIndex] = ''
+			}
+		}
+		res.json({ result: true, indexs : indexs })
+	} else {
+		res.json({ result: true })
+	}
 })
 
 app.get(`/ranking`, (req, res) => {
@@ -169,7 +192,7 @@ app.get(`/ranking`, (req, res) => {
 			object.username = ele.username;
 			object.score = ele.history[0].score;
 			ranks.push(object);
-		}else if(ele.type == `user` && ele.history.length == 0){
+		} else if (ele.type == `user` && ele.history.length == 0) {
 			let object = {};
 			object.username = ele.username;
 			object.score = 0;

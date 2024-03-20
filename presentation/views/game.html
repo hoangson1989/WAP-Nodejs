@@ -102,9 +102,8 @@
                 currentQuestion = res
 
                 $('h3#question').html(`Question ${questionNumber}: ` + res.question)
-                let answers = res.incorrect_answers
-                const randomIndex = Math.floor(Math.random() * (answers.length + 1));
-                answers.splice(randomIndex, 0, res.correct_answer);
+                let answers = res.answers
+                console.log('aa', res.answer)
                 let divs = $('div.answer')
                 for (let i = 0; i < answers.length; i++) {
                     let prefix = 'D: ';
@@ -132,6 +131,7 @@
             $('#progress').css('animation-play-state', 'paused');
         }
 
+        let internalTimer;
         function resetAnimation() {
             $('#progress').css('animation', 'none');
             $('#progress').css('clip-path', 'polygon(50% 50%, 50% 0, 100% 0, 100% 50%, 100% 100%, 50% 100%, 0% 100%, 0% 50%, 0% 0%, 50% 0%)')
@@ -140,6 +140,18 @@
                 $('#progress').css('animation-play-state', 'running');
                 timeoutID = setTimeout(timeout, 60000);
             }, 10);
+
+            if (internalTimer != null && internalTimer != undefined) {
+                clearInterval(internalTimer)
+            }
+            $('label#counting').html('60')
+            internalTimer = setInterval(() => {
+                let remain = parseInt($('label#counting').html())
+                if (remain > 0) {
+                    remain -= 1
+                    $('label#counting').html('' +remain)
+                }
+            }, 1000);
         }
 
         function playSound(flag) {
@@ -164,16 +176,10 @@
                     pauseAnimation()
                     getQuestion()
                 } else if (type == 'half') {
-                    let count = 0;
-                    let correctAns = currentQuestion.correct_answer
+                    let indexs = res.indexs
                     let divs = $('div.answer')
-                    while (count < 2) {
-                        const randomIndex = Math.floor(Math.random() * divs.length);
-                        let divText = $(divs[randomIndex]).html()
-                        if (divText.length > 0 && divText.includes(correctAns) == false) {
-                            count++
-                            $(divs[randomIndex]).html('')
-                        }
+                    for (let idx of indexs) {
+                        $(divs[idx]).html('')
                     }
                 } else {
                     let names = ['Chi',
@@ -289,8 +295,10 @@
                 </div>
 
                 <img id="clock"
-                    src="/images/30-second-timer-display-in-flat-style-countdown-time-counter-in-circle-png.png">
+                    src="/images/30-second-timer-display-in-flat-style-countdown-time-counter-in-circle-png.png">            
             </div>
+            <label id="counting" style="z-index: 99;position: absolute;
+            top: 42px; right: 42px; font-weight: bold;">60</label>    
         </div>
 
         <div id="failure">You're fail!!!</div>
