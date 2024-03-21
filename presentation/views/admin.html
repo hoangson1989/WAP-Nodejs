@@ -67,6 +67,15 @@
             $("#questionModal").modal('show');
         }
 
+        function logout() {
+            $.post('/userAction', {
+				'action': 'Logout'
+			}).done((res) => {
+				console.log(res)
+				window.location.href = '/';
+			})
+        }
+
         function saveQuestion(){
             // const json = convertFormToJSON("#questionForm");
             const json = $("#questionForm")
@@ -136,6 +145,7 @@
 
     <div id="toolbar">
         <button class="btn btn-primary" data-toggle="modal" onclick="newQuestion()">New Question</button>
+        <button class="btn btn-primary" onclick="logout()">Logout</button>
       </div>
     <table id="questions"
         data-toolbar="#toolbar"
