@@ -92,8 +92,9 @@ app.post("/answerQuestion", (req, res) => {
 		oldQuestionIDs = [];
 	}
 	//
-	let question = JSON.parse(req.body.question);
+	let question = currentQuestion
 	let answer = req.body.answer;
+	console.log('aa',question, answer)
 	if (question.correct_answer == answer) {
 		oldQuestionIDs.push(question.id);
 		res.cookie("olds", oldQuestionIDs);
