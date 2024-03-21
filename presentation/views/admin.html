@@ -128,8 +128,13 @@
     </script>
 </head>
 
-
 <body>
+    <header style="display: flex; justify-content: space-between; background-color: aqua; padding: 15px;">
+        <div>Hello Admin</div>
+        <div></div>
+        <a href="#" onclick="logout()">Logout</a>
+    </header>
+
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-8 col-md-offset-2">
@@ -145,7 +150,6 @@
 
     <div id="toolbar">
         <button class="btn btn-primary" data-toggle="modal" onclick="newQuestion()">New Question</button>
-        <button class="btn btn-primary" onclick="logout()">Logout</button>
       </div>
     <table id="questions"
         data-toolbar="#toolbar"
